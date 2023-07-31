@@ -10,7 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_chat_ui: ^1.6.9
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   uuid: ^3.0.7
@@ -21,7 +20,6 @@ dependencies:
   riverpod: ^2.3.6
   synchronized: ^3.1.0
   intl: ^0.18.1
-  flutter_chat_types: ^3.6.2
   stream_channel: ^2.1.0
   async: ^2.11.0
   webview_flutter: ^4.2.2

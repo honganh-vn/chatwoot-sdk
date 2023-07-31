@@ -43,7 +43,7 @@ class ChatwootChat extends StatefulWidget {
   final double? onEndReachedThreshold;
 
   /// See [Message.onMessageLongPress]
-  final void Function(types.Message)? onMessageLongPress;
+  final void Function(BuildContext, types.Message)? onMessageLongPress;
 
   /// See [Message.onMessageTap]
   final void Function(types.Message)? onMessageTap;
@@ -131,7 +131,7 @@ class ChatwootChat extends StatefulWidget {
       this.onTextChanged,
       this.showUserAvatars = true,
       this.showUserNames = true,
-      this.theme = const ChatwootChatTheme(),
+      this.theme = ChatwootChatTheme(),
       this.l10n = const ChatwootL10n(),
       this.timeFormat,
       this.dateFormat,
@@ -312,7 +312,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
         createdAt: DateTime.parse(message.createdAt).millisecondsSinceEpoch);
   }
 
-  void _addMessage(types.Message message) {
+  void _addMessage(types.TextMessage message) {
     setState(() {
       _messages.insert(0, message);
     });
@@ -333,7 +333,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
     });
   }
 
-  void _handleMessageTap(types.Message message) async {
+  void _handleMessageTap(BuildContext,types.Message message) async {
     if (message.status == types.Status.error && message is types.TextMessage) {
       _handleResendMessage(message);
     }
@@ -355,7 +355,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
   }
 
   void _handleMessageSent(
-    types.Message message,
+    types.TextMessage message,
   ) {
     final index = _messages.indexWhere((element) => element.id == message.id);
 
@@ -371,7 +371,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
   }
 
   void _handleMessageUpdated(
-    types.Message message,
+    types.TextMessage message,
   ) {
     final index = _messages.indexWhere((element) => element.id == message.id);
 
@@ -418,7 +418,8 @@ class _ChatwootChatState extends State<ChatwootChat> {
                 onEndReached: widget.onEndReached,
                 onEndReachedThreshold: widget.onEndReachedThreshold,
                 onMessageLongPress: widget.onMessageLongPress,
-                onTextChanged: widget.onTextChanged,
+
+                // onTextChanged: widget.onTextChanged,
                 showUserAvatars: widget.showUserAvatars,
                 showUserNames: widget.showUserNames,
                 timeFormat: widget.timeFormat ?? DateFormat.Hm(),

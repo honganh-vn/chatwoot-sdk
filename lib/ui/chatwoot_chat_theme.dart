@@ -5,6 +5,14 @@ const CHATWOOT_COLOR_PRIMARY = Color(0xff1f93ff);
 const CHATWOOT_BG_COLOR = Color(0xfff4f6fb);
 const CHATWOOT_AVATAR_COLORS = [CHATWOOT_COLOR_PRIMARY];
 
+const NEUTRAL_2 = Color.fromARGB(255, 223, 224, 228);
+const ERROR = Color.fromARGB(255, 231, 14, 14);
+const PRIMARY = Color.fromARGB(255, 10, 170, 219);
+const NEUTRAL_0 = Color(0xfff4f6fb);
+const NEUTRAL_7_WITH_OPACITY = Color(0xfff4f6fb);
+const NEUTRAL_7 = Color(0xfff4f6fb);
+
+
 /// Default chatwoot chat theme which extends [ChatTheme]
 @immutable
 class ChatwootChatTheme extends ChatTheme {
@@ -142,5 +150,6 @@ class ChatwootChatTheme extends ChatTheme {
           userAvatarNameColors: userAvatarNameColors,
           userAvatarTextStyle: userAvatarTextStyle,
           userNameTextStyle: userNameTextStyle,
+       
         );
 }

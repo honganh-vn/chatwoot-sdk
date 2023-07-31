@@ -41,9 +41,9 @@ void main() {
       mockProviderContainer = ProviderContainer();
       mockProviderContainer.updateOverrides([
         localStorageProvider
-            .overrideWithProvider((ref, param) => mockLocalStorage),
+            .overrideWithProvider((ref) => mockLocalStorage),
         chatwootRepositoryProvider
-            .overrideWithProvider((ref, param) => mockRepository)
+            .overrideWithProvider((ref) => mockRepository)
       ]);
       ChatwootClient.providerContainerMap.update(
           testClientInstanceKey, (_) => mockProviderContainer,

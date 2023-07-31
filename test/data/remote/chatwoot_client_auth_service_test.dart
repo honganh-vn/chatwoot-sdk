@@ -31,31 +31,23 @@ void main() {
     });
 
     _createSuccessResponse(body) {
-      return Response(
-          data: body,
-          statusCode: 200,
-          requestOptions: RequestOptions(path: ""));
+      return Response(data: body, statusCode: 200, requestOptions: RequestOptions(path: ""));
     }
 
     _createErrorResponse({required int statusCode, body}) {
-      return Response(
-          data: body,
-          statusCode: statusCode,
-          requestOptions: RequestOptions(path: ""));
+      return Response(data: body, statusCode: statusCode, requestOptions: RequestOptions(path: ""));
     }
 
     test(
         'Given contact is successfully created when createNewContact is called, then return created contact',
         () async {
       //GIVEN
-      final responseBody =
-          await TestResourceUtil.readJsonResource(fileName: "contact");
-      when(mockDio.post(any, data: testUser.toJson())).thenAnswer(
-          (_) => Future.value(_createSuccessResponse(responseBody)));
+      final responseBody = await TestResourceUtil.readJsonResource(fileName: "contact");
+      when(mockDio.post(any, data: testUser.toJson()))
+          .thenAnswer((_) => Future.value(_createSuccessResponse(responseBody)));
 
       //WHEN
-      final result =
-          await clientService.createNewContact(testInboxIdentifier, testUser);
+      final result = await clientService.createNewContact(testInboxIdentifier, testUser);
 
       //THEN
       expect(result, ChatwootContact.fromJson(responseBody));
@@ -65,8 +57,8 @@ void main() {
         'Given contact creation returns with error response when createNewContact is called, then throw error',
         () async {
       //GIVEN
-      when(mockDio.post(any, data: testUser.toJson())).thenAnswer(
-          (_) => Future.value(_createErrorResponse(statusCode: 401, body: {})));
+      when(mockDio.post(any, data: testUser.toJson()))
+          .thenAnswer((_) => Future.value(_createErrorResponse(statusCode: 401, body: {})));
 
       //WHEN
       ChatwootClientException? chatwootClientException;
@@ -78,15 +70,14 @@ void main() {
 
       //THEN
       expect(chatwootClientException, isNotNull);
-      expect(chatwootClientException!.type,
-          equals(ChatwootClientExceptionType.CREATE_CONTACT_FAILED));
+      expect(
+          chatwootClientException!.type, equals(ChatwootClientExceptionType.CREATE_CONTACT_FAILED));
     });
 
-    test(
-        'Given contact creation fails when createNewContact is called, then throw error',
+    test('Given contact creation fails when createNewContact is called, then throw error',
         () async {
       //GIVEN
-      final testError = DioError(requestOptions: RequestOptions(path: ""));
+      final testError = DioException(requestOptions: RequestOptions(path: ""));
       when(mockDio.post(any, data: testUser.toJson())).thenThrow(testError);
 
       //WHEN
@@ -99,22 +90,20 @@ void main() {
 
       //THEN
       expect(chatwootClientException, isNotNull);
-      expect(chatwootClientException!.type,
-          equals(ChatwootClientExceptionType.CREATE_CONTACT_FAILED));
+      expect(
+          chatwootClientException!.type, equals(ChatwootClientExceptionType.CREATE_CONTACT_FAILED));
     });
 
     test(
         'Given conversation is successfully created when createNewConversation is called, then return created conversation',
         () async {
       //GIVEN
-      final responseBody =
-          await TestResourceUtil.readJsonResource(fileName: "conversation");
-      when(mockDio.post(any)).thenAnswer(
-          (_) => Future.value(_createSuccessResponse(responseBody)));
+      final responseBody = await TestResourceUtil.readJsonResource(fileName: "conversation");
+      when(mockDio.post(any)).thenAnswer((_) => Future.value(_createSuccessResponse(responseBody)));
 
       //WHEN
-      final result = await clientService.createNewConversation(
-          testInboxIdentifier, testContactIdentifier);
+      final result =
+          await clientService.createNewConversation(testInboxIdentifier, testContactIdentifier);
 
       //THEN
       expect(result, ChatwootConversation.fromJson(responseBody));
@@ -124,14 +113,13 @@ void main() {
         'Given conversation creation returns with error response when createNewConversation is called, then throw error',
         () async {
       //GIVEN
-      when(mockDio.post(any)).thenAnswer(
-          (_) => Future.value(_createErrorResponse(statusCode: 401, body: {})));
+      when(mockDio.post(any))
+          .thenAnswer((_) => Future.value(_createErrorResponse(statusCode: 401, body: {})));
 
       //WHEN
       ChatwootClientException? chatwootClientException;
       try {
-        await clientService.createNewConversation(
-            testInboxIdentifier, testContactIdentifier);
+        await clientService.createNewConversation(testInboxIdentifier, testContactIdentifier);
       } on ChatwootClientException catch (e) {
         chatwootClientException = e;
       }
@@ -142,18 +130,16 @@ void main() {
           equals(ChatwootClientExceptionType.CREATE_CONVERSATION_FAILED));
     });
 
-    test(
-        'Given conversation creation fails when createNewConversation is called, then throw error',
+    test('Given conversation creation fails when createNewConversation is called, then throw error',
         () async {
       //GIVEN
-      final testError = DioError(requestOptions: RequestOptions(path: ""));
+      final testError = DioException(requestOptions: RequestOptions(path: ""));
       when(mockDio.post(any)).thenThrow(testError);
 
       //WHEN
       ChatwootClientException? chatwootClientException;
       try {
-        await clientService.createNewConversation(
-            testInboxIdentifier, testContactIdentifier);
+        await clientService.createNewConversation(testInboxIdentifier, testContactIdentifier);
       } on ChatwootClientException catch (e) {
         chatwootClientException = e;
       }

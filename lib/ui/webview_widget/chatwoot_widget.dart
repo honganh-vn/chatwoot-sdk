@@ -12,7 +12,7 @@ class ChatwootWidget extends StatefulWidget {
   final String baseUrl;
 
   ///User information about the user like email, username and avatar_url
-  final ChatwootUser? user;
+  final ChatwootUser user;
 
   ///User locale
   final String locale;
@@ -21,7 +21,7 @@ class ChatwootWidget extends StatefulWidget {
   final void Function()? closeWidget;
 
   ///Additional information about the customer
-  final customAttributes;
+  final dynamic customAttributes;
 
   ///Widget Attachment event. Currently supported only on Android devices
   final Future<List<String>> Function()? onAttachFile;
@@ -34,11 +34,11 @@ class ChatwootWidget extends StatefulWidget {
 
   ///Widget Load completed event
   final void Function()? onLoadCompleted;
-  ChatwootWidget(
+  const ChatwootWidget(
       {Key? key,
       required this.websiteToken,
       required this.baseUrl,
-      this.user,
+      required this.user,
       this.locale = "en",
       this.customAttributes,
       this.closeWidget,
@@ -49,15 +49,10 @@ class ChatwootWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _ChatwootWidgetState createState() => _ChatwootWidgetState();
+  State<ChatwootWidget> createState() => _ChatwootWidgetState();
 }
 
 class _ChatwootWidgetState extends State<ChatwootWidget> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Webview(

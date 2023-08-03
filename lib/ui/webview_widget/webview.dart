@@ -4,20 +4,12 @@ import 'dart:io';
 import 'package:chatwoot_sdk/chatwoot_sdk.dart';
 import 'package:chatwoot_sdk/ui/webview_widget/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_android/webview_flutter_android.dart'
-    as webview_flutter_android;
+import 'package:webview_flutter_android/webview_flutter_android.dart' as webview_flutter_android;
 
 ///Chatwoot webview widget
 /// {@category FlutterClientSdk}
 class Webview extends StatefulWidget {
-  /// Url for Chatwoot widget in webview
-  late final String widgetUrl;
-
-  /// Chatwoot user & locale initialisation script
-  late final String injectedJavaScript;
-
   /// See [ChatwootWidget.closeWidget]
   final void Function()? closeWidget;
 
@@ -33,45 +25,50 @@ class Webview extends StatefulWidget {
   /// See [ChatwootWidget.onLoadCompleted]
   final void Function()? onLoadCompleted;
 
-  Webview(
+  final String websiteToken;
+  final String baseUrl;
+  final ChatwootUser user;
+  final String? locale;
+  final dynamic customAttributes;
+
+  const Webview(
       {Key? key,
-      required String websiteToken,
-      required String baseUrl,
-      ChatwootUser? user,
-      String locale = "en",
-      customAttributes,
+      required this.websiteToken,
+      required this.baseUrl,
+      required this.user,
+      this.locale = "en",
+      this.customAttributes,
       this.closeWidget,
       this.onAttachFile,
       this.onLoadStarted,
       this.onLoadProgress,
       this.onLoadCompleted})
-      : super(key: key) {
-    widgetUrl =
-        "${baseUrl}/widget?website_token=${websiteToken}&locale=${locale}";
-
-    injectedJavaScript = generateScripts(
-        user: user, locale: locale, customAttributes: customAttributes);
-  }
+      : super(key: key);
 
   @override
-  _WebviewState createState() => _WebviewState();
+  State<Webview> createState() => _WebviewState();
 }
 
 class _WebviewState extends State<Webview> {
+  /// Chatwoot user & locale initialisation script
+  late final String injectedJavaScript = generateScripts(
+      user: widget.user, locale: widget.locale, customAttributes: widget.customAttributes);
+
   WebViewController? _controller;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      String webviewUrl = widget.widgetUrl;
+      String webviewUrl =
+          "${widget.baseUrl}/widget?website_token=${widget.websiteToken}&locale=${widget.locale}";
       final cwCookie = await StoreHelper.getCookie();
       if (cwCookie.isNotEmpty) {
-        webviewUrl = "${webviewUrl}&cw_conversation=${cwCookie}";
+        webviewUrl = "$webviewUrl&cw_conversation=$cwCookie";
       }
       setState(() {
         _controller = WebViewController()
           ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..setBackgroundColor(Colors.white)
+          ..setBackgroundColor(Theme.of(context).scaffoldBackgroundColor)
           ..setNavigationDelegate(
             NavigationDelegate(
               onProgress: (int progress) {
@@ -85,10 +82,10 @@ class _WebviewState extends State<Webview> {
                 widget.onLoadCompleted?.call();
               },
               onWebResourceError: (WebResourceError error) {},
-              onNavigationRequest: (NavigationRequest request) {
-                _goToUrl(request.url);
-                return NavigationDecision.prevent;
-              },
+              // onNavigationRequest: (NavigationRequest request) {
+              //   // _goToUrl(request.url);
+              //   return NavigationDecision.prevent;
+              // },
             ),
           )
           ..addJavaScriptChannel("ReactNativeWebView",
@@ -102,7 +99,7 @@ class _WebviewState extends State<Webview> {
               if (eventType == 'loaded') {
                 final authToken = parsedMessage["config"]["authToken"];
                 StoreHelper.storeCookie(authToken);
-                _controller?.runJavaScript(widget.injectedJavaScript);
+                _controller?.runJavaScript(injectedJavaScript);
               }
               if (type == 'close-widget') {
                 widget.closeWidget?.call();
@@ -112,10 +109,9 @@ class _WebviewState extends State<Webview> {
           ..loadRequest(Uri.parse(webviewUrl));
 
         if (Platform.isAndroid && widget.onAttachFile != null) {
-          final androidController = _controller!.platform
-              as webview_flutter_android.AndroidWebViewController;
-          androidController
-              .setOnShowFileSelector((_) => widget.onAttachFile!.call());
+          final androidController =
+              _controller!.platform as webview_flutter_android.AndroidWebViewController;
+          androidController.setOnShowFileSelector((_) => widget.onAttachFile!.call());
         }
       });
     });
@@ -123,12 +119,10 @@ class _WebviewState extends State<Webview> {
 
   @override
   Widget build(BuildContext context) {
-    return _controller != null
-        ? WebViewWidget(controller: _controller!)
-        : SizedBox();
+    return _controller != null ? WebViewWidget(controller: _controller!) : const SizedBox();
   }
 
-  _goToUrl(String url) {
-    launchUrl(Uri.parse(url));
-  }
+  // _goToUrl(String url) {
+  //   launchUrl(Uri.parse(url));
+  // }
 }

@@ -15,8 +15,8 @@ bool isJsonString(string) {
 }
 
 String createWootPostMessage(object) {
-  final stringfyObject = "${WOOT_PREFIX}${jsonEncode(object)}";
-  final script = 'window.postMessage(\'${stringfyObject}\');';
+  final stringfyObject = "$WOOT_PREFIX${jsonEncode(object)}";
+  final script = 'window.postMessage(\'$stringfyObject\');';
   return script;
 }
 
@@ -24,8 +24,7 @@ String getMessage(String data) {
   return data.replaceAll(WOOT_PREFIX, '');
 }
 
-String generateScripts(
-    {ChatwootUser? user, String? locale, dynamic customAttributes}) {
+String generateScripts({ChatwootUser? user, String? locale, dynamic customAttributes}) {
   String script = '';
   if (user != null) {
     final userObject = {
@@ -36,10 +35,7 @@ String generateScripts(
     script += createWootPostMessage(userObject);
   }
   if (locale != null) {
-    final localeObject = {
-      "event": PostMessageEvents.SET_LOCALE,
-      "locale": locale
-    };
+    final localeObject = {"event": PostMessageEvents.SET_LOCALE, "locale": locale};
     script += createWootPostMessage(localeObject);
   }
   if (customAttributes != null) {
@@ -55,7 +51,7 @@ String generateScripts(
 const _androidOptions = AndroidOptions(
   encryptedSharedPreferences: true,
 );
-final secureStorage = new FlutterSecureStorage(aOptions: _androidOptions);
+const secureStorage = FlutterSecureStorage(aOptions: _androidOptions);
 const cookieKey = 'cwCookie';
 
 class StoreHelper {

@@ -16,7 +16,8 @@ abstract class ChatwootClientAuthService {
 
   ChatwootClientAuthService(this.dio);
 
-  Future<ChatwootContact> createNewContact(String inboxIdentifier, ChatwootUser? user);
+  Future<ChatwootContact> createNewContact(
+      String inboxIdentifier, ChatwootUser? user);
 
   Future<ChatwootConversation> createNewConversation(
       String inboxIdentifier, String contactIdentifier);
@@ -28,20 +29,24 @@ class ChatwootClientAuthServiceImpl extends ChatwootClientAuthService {
 
   ///Creates new contact for inbox with [inboxIdentifier] and passes [user] body to be linked to created contact
   @override
-  Future<ChatwootContact> createNewContact(String inboxIdentifier, ChatwootUser? user) async {
+  Future<ChatwootContact> createNewContact(
+      String inboxIdentifier, ChatwootUser? user) async {
     try {
-      final createResponse =
-          await dio.post("/public/api/v1/inboxes/$inboxIdentifier/contacts", data: user?.toJson());
+      final createResponse = await dio.post(
+          "/public/api/v1/inboxes/$inboxIdentifier/contacts",
+          data: user?.toJson());
       if ((createResponse.statusCode ?? 0).isBetween(199, 300)) {
         //creating contact successful continue with request
         final contact = ChatwootContact.fromJson(createResponse.data);
         return contact;
       } else {
-        throw ChatwootClientException(createResponse.statusMessage ?? "unknown error",
+        throw ChatwootClientException(
+            createResponse.statusMessage ?? "unknown error",
             ChatwootClientExceptionType.CREATE_CONTACT_FAILED);
       }
-    } on DioException catch (e) {
-      throw ChatwootClientException(e.message!, ChatwootClientExceptionType.CREATE_CONTACT_FAILED);
+    } on DioError catch (e) {
+      throw ChatwootClientException(
+          e.message, ChatwootClientExceptionType.CREATE_CONTACT_FAILED);
     }
   }
 
@@ -54,15 +59,17 @@ class ChatwootClientAuthServiceImpl extends ChatwootClientAuthService {
           "/public/api/v1/inboxes/$inboxIdentifier/contacts/$contactIdentifier/conversations");
       if ((createResponse.statusCode ?? 0).isBetween(199, 300)) {
         //creating contact successful continue with request
-        final newConversation = ChatwootConversation.fromJson(createResponse.data);
+        final newConversation =
+            ChatwootConversation.fromJson(createResponse.data);
         return newConversation;
       } else {
-        throw ChatwootClientException(createResponse.statusMessage ?? "unknown error",
+        throw ChatwootClientException(
+            createResponse.statusMessage ?? "unknown error",
             ChatwootClientExceptionType.CREATE_CONVERSATION_FAILED);
       }
-    } on DioException catch (e) {
+    } on DioError catch (e) {
       throw ChatwootClientException(
-          e.message!, ChatwootClientExceptionType.CREATE_CONVERSATION_FAILED);
+          e.message, ChatwootClientExceptionType.CREATE_CONVERSATION_FAILED);
     }
   }
 }

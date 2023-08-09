@@ -20,7 +20,7 @@ to your project's [pubspec.yml](https://flutter.dev/docs/development/tools/pubsp
 
 ## 2. How to use
 
-### a. Using ChatwootWidget
+### a. Using ChatwootWebview
 
 * Create a website channel in chatwoot server by following the steps described here https://www.chatwoot.com/docs/channels/website
 * Replace websiteToken prop and baseUrl
@@ -133,6 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
 Horray! You're done.
 
 
+
 #### Available Parameters
 
 | Name             | Default | Type                            | Description                                                                                            |
@@ -146,9 +147,119 @@ Horray! You're done.
 | onAttachFile     | -       | Future<List<String>> Function() | Widget Attachment event. Should return a list of File Uris Currently supported only on Android devices |
 | onLoadStarted    | -       | void Function()                 | Widget load start event                                                                                |
 | onLoadProgress   | -       | void Function(int)              | Widget Load progress event                                                                             |
-| onLoadCompleted  | -       | void Function()                 | Widget Load completed event                                                                            |
+| onLoadCompleted  | -       | void Function()                 | Widget Load completed event    
 
-### b. Using Chatwoot Client
+
+### b. Using ChatwootChatDialog
+
+Simply call ```ChatwootChatDialog.show``` with your parameters to show chat dialog. To close dialog use ```Navigator.pop(context)```.
+
+```dart
+ChatwootChatDialog.show(
+  context,
+  baseUrl: "<<<your-chatwoot-base-url-here>>>",
+  inboxIdentifier: "<<<your-inbox-identifier-here>>>",
+  title: "Chatwoot Support",
+  user: ChatwootUser(
+    identifier: "john@gmail.com",
+    name: "John Samuel",
+    email: "john@gmail.com",
+  ),
+);
+```
+
+
+### c. Using ChatwootChat Widget
+
+To embed ChatwootChat widget inside a part of your app, use the ```ChatwootChat``` widget. Customize chat UI theme by passing a ```ChatwootChatTheme``` with your custom theme colors and more.
+
+```dart
+import 'package:chatwoot_client_sdk/chatwoot_client_sdk.dart';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(title: 'Flutter Demo Home Page'),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+
+  @override
+  Widget build(BuildContext context) {
+    return ChatwootChat(
+      baseUrl: "<<<your-chatwoot-base-url-here>>>",
+      inboxIdentifier: "<<<your-inbox-identifier-here>>>",
+      user: ChatwootUser(
+        identifier: "john@gmail.com",
+        name: "John Samuel",
+        email: "john@gmail.com",
+      ),
+      appBar: AppBar(
+        title: Text(
+          "Chatwoot",
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        backgroundColor: Colors.white,
+      ),
+      onWelcome: (){
+        print("Welcome event received");
+      },
+      onPing: (){
+        print("Ping event received");
+      },
+      onConfirmedSubscription: (){
+        print("Confirmation event received");
+      },
+      onMessageDelivered: (_){
+        print("Message delivered event received");
+      },
+      onMessageSent: (_){
+        print("Message sent event received");
+      },
+      onConversationIsOffline: (){
+        print("Conversation is offline event received");
+      },
+      onConversationIsOnline: (){
+        print("Conversation is online event received");
+      },
+      onConversationStoppedTyping: (){
+        print("Conversation stopped typing event received");
+      },
+      onConversationStartedTyping: (){
+        print("Conversation started typing event received");
+      },
+    );
+  }
+}
+
+```                                                                        |
+
+### d. Using Chatwoot Client
 * Create an Api inbox in Chatwoot. Refer to [Create API Channel](https://www.chatwoot.com/docs/product/channels/api/create-channel) document.
 * Create your own customized chat ui and use `ChatwootClient` to load and sendMessages. Messaging events like `onMessageSent` and `onMessageReceived` will be triggered on `ChatwootCallback` argument passed when creating the client instance.
 

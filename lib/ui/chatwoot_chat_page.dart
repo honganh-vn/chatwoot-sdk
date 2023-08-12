@@ -400,8 +400,8 @@ class _ChatwootChatState extends State<ChatwootChat> {
       body: Column(
         children: [
           Flexible(
-            child: Padding(
-              padding: EdgeInsets.only(left: horizontalPadding, right: horizontalPadding),
+            // child: Padding(
+              // padding: EdgeInsets.only(left: horizontalPadding, right: horizontalPadding),
               child: Chat(
                 messages: _messages,
                 onMessageTap: _handleMessageTap,
@@ -421,7 +421,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
                 // theme: theme,
                 l10n: widget.l10n,
               ),
-            ),
+            // ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

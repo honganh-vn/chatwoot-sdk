@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatwoot_sdk/chatwoot_callbacks.dart';
 import 'package:chatwoot_sdk/chatwoot_client.dart';
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_message.dart';
@@ -7,7 +9,10 @@ import 'package:chatwoot_sdk/ui/chatwoot_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 ///Chatwoot chat widget
@@ -113,6 +118,8 @@ class ChatwootChat extends StatefulWidget {
 
   ///Horizontal padding is reduced if set to true
   final bool isPresentedInDialog;
+
+  // final void Function()? onAttachmentPressed;
 
   const ChatwootChat(
       {Key? key,
@@ -301,6 +308,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
               ),
         text: message.content ?? "",
         status: types.Status.seen,
+        type: types.MessageType.text,
         createdAt: DateTime.parse(message.createdAt).millisecondsSinceEpoch);
   }
 
@@ -328,6 +336,45 @@ class _ChatwootChatState extends State<ChatwootChat> {
   void _handleMessageTap(BuildContext context, types.Message message) async {
     if (message.status == types.Status.error && message is types.TextMessage) {
       _handleResendMessage(message);
+    }
+
+    if (message is types.FileMessage) {
+      var localPath = message.uri;
+
+      if (message.uri.startsWith('http')) {
+        try {
+          final index = _messages.indexWhere((element) => element.id == message.id);
+          final updatedMessage = (_messages[index] as types.FileMessage).copyWith(
+            isLoading: true,
+          );
+
+          setState(() {
+            _messages[index] = updatedMessage;
+          });
+
+          final client = http.Client();
+          final request = await client.get(Uri.parse(message.uri));
+          final bytes = request.bodyBytes;
+          final documentsDir = (await getApplicationDocumentsDirectory()).path;
+          localPath = '$documentsDir/${message.name}';
+
+          if (!File(localPath).existsSync()) {
+            final file = File(localPath);
+            await file.writeAsBytes(bytes);
+          }
+        } finally {
+          final index = _messages.indexWhere((element) => element.id == message.id);
+          final updatedMessage = (_messages[index] as types.FileMessage).copyWith(
+            isLoading: null,
+          );
+
+          setState(() {
+            _messages[index] = updatedMessage;
+          });
+        }
+      }
+
+      await OpenFilex.open(localPath);
     }
     widget.onMessageTap?.call(message);
   }
@@ -389,63 +436,75 @@ class _ChatwootChatState extends State<ChatwootChat> {
     widget.onSendPressed?.call(message);
   }
 
+  // void _handleAttachmentPressed() {
+  //   widget.onAttachmentPressed?.call();
+  // }
+
   @override
   Widget build(BuildContext context) {
-    final horizontalPadding = widget.isPresentedInDialog ? 8.0 : 16.0;
+    // final horizontalPadding = widget.isPresentedInDialog ? 8.0 : 16.0;
     // ChatwootChatTheme theme = widget.theme ?? ChatwootChatTheme();
-
     return Scaffold(
       appBar: widget.appBar,
       // backgroundColor: theme.backgroundColor,
-      body: Column(
-        children: [
-          Flexible(
-            // child: Padding(
-              // padding: EdgeInsets.only(left: horizontalPadding, right: horizontalPadding),
-              child: Chat(
-                messages: _messages,
-                onMessageTap: _handleMessageTap,
-                onPreviewDataFetched: _handlePreviewDataFetched,
-                onSendPressed: _handleSendPressed,
-                user: _user,
-                onEndReached: widget.onEndReached,
-                onEndReachedThreshold: widget.onEndReachedThreshold,
-                onMessageLongPress: widget.onMessageLongPress,
-                inputOptions: InputOptions(
-                  onTextChanged: widget.onTextChanged,
-                ),
-                showUserAvatars: widget.showUserAvatars,
-                showUserNames: widget.showUserNames,
-                timeFormat: widget.timeFormat ?? DateFormat.Hm(),
-                dateFormat: widget.timeFormat ?? DateFormat("EEEE MMMM d"),
-                // theme: theme,
-                l10n: widget.l10n,
-              ),
-            // ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  "assets/logo_grey.png",
-                  package: 'chatwoot_sdk',
-                  width: 15,
-                  height: 15,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Text(
-                    "Powered by Chatwoot",
-                    style: TextStyle(color: Colors.black45, fontSize: 12),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: RefreshIndicator(
+          child: Column(
+            children: [
+              Flexible(
+                // child: Padding(
+                // padding: EdgeInsets.only(left: horizontalPadding, right: horizontalPadding),
+                child: Chat(
+                  messages: _messages,
+                  onMessageTap: _handleMessageTap,
+                  onPreviewDataFetched: _handlePreviewDataFetched,
+                  onSendPressed: _handleSendPressed,
+                  // onAttachmentPressed: _handleAttachmentPressed,
+                  user: _user,
+                  onEndReached: widget.onEndReached,
+                  onEndReachedThreshold: widget.onEndReachedThreshold,
+                  onMessageLongPress: widget.onMessageLongPress,
+                  inputOptions: InputOptions(
+                    onTextChanged: widget.onTextChanged,
                   ),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+                  showUserAvatars: widget.showUserAvatars,
+                  showUserNames: widget.showUserNames,
+                  timeFormat: widget.timeFormat ?? DateFormat.Hm(),
+                  dateFormat: widget.timeFormat ?? DateFormat("EEEE MMMM d"),
+                  // theme: theme,
+                  l10n: widget.l10n,
+                 usePreviewData: true,
+
+                ),
+                // ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      "assets/logo_grey.png",
+                      package: 'chatwoot_sdk',
+                      width: 15,
+                      height: 15,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        "Powered by Chatwoot",
+                        style: TextStyle(color: Colors.black45, fontSize: 12),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+          onRefresh: () async {
+            chatwootClient!.loadMessages();
+            setState(() {});
+          }),
     );
   }
 

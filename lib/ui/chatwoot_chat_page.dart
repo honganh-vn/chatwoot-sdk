@@ -9,6 +9,7 @@ import 'package:chatwoot_sdk/ui/chatwoot_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:open_filex/open_filex.dart';
@@ -168,10 +169,8 @@ class _ChatwootChatState extends State<ChatwootChat> {
   late String status;
 
   final idGen = Uuid();
-  late final _user;
+  late types.User _user;
   ChatwootClient? chatwootClient;
-
-  late final chatwootCallbacks;
 
   @override
   void initState() {
@@ -187,7 +186,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
       );
     }
 
-    chatwootCallbacks = ChatwootCallbacks(
+    final chatwootCallbacks = ChatwootCallbacks(
       onWelcome: () {
         widget.onWelcome?.call();
       },
@@ -292,6 +291,20 @@ class _ChatwootChatState extends State<ChatwootChat> {
   types.TextMessage _chatwootMessageToTextMessage(ChatwootMessage message, {String? echoId}) {
     String? avatarUrl = message.sender?.avatarUrl ?? message.sender?.thumbnail;
 
+    if (message.sender == null) {
+      return types.TextMessage(
+          id: echoId ?? message.id.toString(),
+          text: message.content ?? "",
+          previewData: types.PreviewData(link: message.content!),
+          createdAt: DateTime.parse(message.createdAt).millisecondsSinceEpoch,
+          author: types.User(
+              id: 'sxcGaVTkvg',
+              firstName: "Bot",
+              imageUrl:
+                  "https://d2cbg94ubxgsnp.cloudfront.net/Pictures/480x270//9/9/3/512993_shutterstock_715962319converted_920340.png"),
+          status: types.Status.delivered);
+    }
+
     //Sets avatar url to null if its a gravatar not found url
     //This enables placeholder for avatar to show
     if (avatarUrl?.contains("?d=404") ?? false) {
@@ -308,7 +321,6 @@ class _ChatwootChatState extends State<ChatwootChat> {
               ),
         text: message.content ?? "",
         status: types.Status.seen,
-        type: types.MessageType.text,
         createdAt: DateTime.parse(message.createdAt).millisecondsSinceEpoch);
   }
 
@@ -465,21 +477,54 @@ class _ChatwootChatState extends State<ChatwootChat> {
                   onEndReachedThreshold: widget.onEndReachedThreshold,
                   onMessageLongPress: widget.onMessageLongPress,
                   inputOptions: InputOptions(
+                    sendButtonVisibilityMode: SendButtonVisibilityMode.always,
                     onTextChanged: widget.onTextChanged,
                   ),
+
                   showUserAvatars: widget.showUserAvatars,
                   showUserNames: widget.showUserNames,
                   timeFormat: widget.timeFormat ?? DateFormat.Hm(),
                   dateFormat: widget.timeFormat ?? DateFormat("EEEE MMMM d"),
-                  // theme: theme,
+                  theme: DefaultChatTheme(
+                      backgroundColor: Color.fromRGBO(248, 250, 255, 1),
+                      inputBackgroundColor: Color.fromRGBO(255, 255, 255, 1),
+                      inputTextColor: Color.fromRGBO(16, 30, 50, 1),
+                      sendButtonIcon: SvgPicture.asset('assets/send.svg',
+                          package: 'chatwoot_sdk', semanticsLabel: 'Send button'),
+                      secondaryColor: Color.fromRGBO(253, 246, 235, 1),
+                      primaryColor: Color.fromRGBO(173, 153, 212, 1),
+                      userAvatarImageBackgroundColor: Color.fromRGBO(0, 102, 245, 1),
+                      sentMessageBodyBoldTextStyle: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white),
+                      sentMessageBodyCodeTextStyle: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontSize: 13, fontWeight: FontWeight.w400, color: Colors.white),
+                      sentMessageBodyTextStyle: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontSize: 13, fontWeight: FontWeight.w400, color: Colors.white),
+                      receivedMessageBodyBoldTextStyle: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.black),
+                      receivedMessageBodyCodeTextStyle: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontSize: 13, fontWeight: FontWeight.w400, color: Colors.black),
+                      receivedMessageBodyTextStyle: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          fontSize: 13, fontWeight: FontWeight.w400, color: Colors.black)),
                   l10n: widget.l10n,
-                 usePreviewData: true,
-
+                  usePreviewData: true,
                 ),
                 // ),
               ),
-              Padding(
+              Container(
                 padding: const EdgeInsets.all(8.0),
+                color: Color.fromRGBO(249, 249, 251, 1),
+                width: MediaQuery.of(context).size.width,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -502,7 +547,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
             ],
           ),
           onRefresh: () async {
-            chatwootClient!.loadMessages();
+            chatwootClient?.loadMessages();
             setState(() {});
           }),
     );

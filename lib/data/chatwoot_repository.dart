@@ -136,7 +136,7 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
       return;
     }
     clientService.startWebSocketConnection(
-        localStorage.contactDao.getContact()!.pubsubToken ?? "");
+        localStorage.contactDao.getContact()?.pubsubToken ?? "");
 
     final newSubscription = clientService.connection!.stream.listen((event) {
       ChatwootEvent chatwootEvent = ChatwootEvent.fromJson(jsonDecode(event));

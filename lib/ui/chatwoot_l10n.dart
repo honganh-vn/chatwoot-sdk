@@ -35,12 +35,12 @@ class ChatwootL10n extends ChatL10n {
   /// Creates a new chatwoot l10n
   const ChatwootL10n(
       {this.attachmentButtonAccessibilityLabel = "",
-      this.emptyChatPlaceholder = "",
+      this.emptyChatPlaceholder = "You have no chat at the moment",
       this.fileButtonAccessibilityLabel = "",
       this.onlineText = "Typically replies in a few hours",
       this.offlineText = "We're away at the moment",
       this.typingText = "typing...",
-      this.inputPlaceholder = "Type your message",
+      this.inputPlaceholder = "Type a message",
       this.sendButtonAccessibilityLabel = "Send Message",
       this.conversationResolvedMessage = "Your ticket has been marked as resolved",
       this.unreadMessagesLabel = "Unread Messages"})

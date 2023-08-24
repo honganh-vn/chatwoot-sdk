@@ -7,6 +7,7 @@ import 'package:chatwoot_sdk/data/remote/requests/chatwoot_action_data.dart';
 import 'package:chatwoot_sdk/data/remote/requests/chatwoot_new_message_request.dart';
 import 'package:chatwoot_sdk/di/modules.dart';
 import 'package:chatwoot_sdk/repository_parameters.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:riverpod/riverpod.dart';
 
 import 'data/local/local_storage.dart';
@@ -147,9 +148,9 @@ class ChatwootClient {
     final container = providerContainerMap["all"]!;
     final params = ChatwootParameters(
         isPersistenceEnabled: true, baseUrl: "", inboxIdentifier: "", clientInstanceKey: "");
-
     final localStorage = container.read(localStorageProvider(params));
     await localStorage.clearAll();
+    await Hive.deleteFromDisk();
 
     localStorage.dispose();
     container.dispose();

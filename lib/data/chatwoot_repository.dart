@@ -43,6 +43,8 @@ abstract class ChatwootRepository {
 
   Future<void> clear();
 
+  Future<void> seenAll();
+
   void dispose();
 }
 
@@ -208,6 +210,11 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
   @override
   Future<void> clear() async {
     await localStorage.clear();
+  }
+    /// Clears all data related to current chatwoot client instance
+  @override
+  Future<void> seenAll() async {
+    await clientService.seenAll();
   }
 
   /// Cancels websocket stream subscriptions and disposes [localStorage]

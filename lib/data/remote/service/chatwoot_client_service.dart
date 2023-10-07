@@ -29,6 +29,8 @@ abstract class ChatwootClientService {
 
   Future<ChatwootMessage> createMessage(ChatwootNewMessageRequest request);
 
+  Future<void> seenAll();
+
   Future<ChatwootMessage> updateMessage(String messageIdentifier, update);
 
   Future<List<ChatwootMessage>> getAllMessages();
@@ -197,5 +199,23 @@ class ChatwootClientServiceImpl extends ChatwootClientService {
         break;
     }
     connection?.sink.add(jsonEncode(action.toJson()));
+  }
+
+  @override
+  Future<void> seenAll() async {
+    try {
+      final createResponse = await _dio.post(
+          "/public/api/v1/inboxes/${ChatwootClientApiInterceptor.INTERCEPTOR_INBOX_IDENTIFIER_PLACEHOLDER}/contacts/${ChatwootClientApiInterceptor.INTERCEPTOR_CONTACT_IDENTIFIER_PLACEHOLDER}/conversations/${ChatwootClientApiInterceptor.INTERCEPTOR_CONVERSATION_IDENTIFIER_PLACEHOLDER}/update_last_seen",);
+      if ((createResponse.statusCode ?? 0).isBetween(199, 300)) {
+        return null;
+      } else {
+        throw ChatwootClientException(
+            createResponse.statusMessage ?? "unknown error",
+            ChatwootClientExceptionType.SEEN_ALL_FAILED);
+      }
+    } on DioError catch (e) {
+      throw ChatwootClientException(
+          e.message, ChatwootClientExceptionType.SEEN_ALL_FAILED);
+    }
   }
 }

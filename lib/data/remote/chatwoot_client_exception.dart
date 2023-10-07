@@ -10,6 +10,7 @@ class ChatwootClientException implements Exception {
 /// {@category FlutterClientSdk}
 enum ChatwootClientExceptionType {
   CREATE_CLIENT_FAILED,
+  SEEN_ALL_FAILED,
   SEND_MESSAGE_FAILED,
   CREATE_CONTACT_FAILED,
   CREATE_CONVERSATION_FAILED,

@@ -54,6 +54,10 @@ class ChatwootClient {
     await _repository.seenAll();
   }
 
+  Future<int> getTotalUnread() async {
+    return Future.value(10);
+  }
+
   /// Sends chatwoot message. The echoId is your temporary message id. When message sends successfully
   /// [ChatwootMessage] will be returned with the [echoId] on [ChatwootCallbacks.onMessageSent]. If
   /// message fails to send [ChatwootCallbacks.onError] will be triggered [echoId] as data.

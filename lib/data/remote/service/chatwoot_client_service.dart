@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_contact.dart';
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_conversation.dart';
@@ -26,6 +27,8 @@ abstract class ChatwootClientService {
   Future<ChatwootContact> getContact();
 
   Future<List<ChatwootConversation>> getConversations();
+
+  Future<int> getTotalUnread();
 
   Future<ChatwootMessage> createMessage(ChatwootNewMessageRequest request);
 
@@ -217,5 +220,11 @@ class ChatwootClientServiceImpl extends ChatwootClientService {
       throw ChatwootClientException(
           e.message, ChatwootClientExceptionType.SEEN_ALL_FAILED);
     }
+  }
+
+  @override
+  Future<int> getTotalUnread() {
+    // todo implement by call api
+    return Future.value(10);
   }
 }

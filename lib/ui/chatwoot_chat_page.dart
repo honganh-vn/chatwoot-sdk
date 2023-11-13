@@ -230,6 +230,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
       onMessageReceived: (chatwootMessage) {
         _addMessage(_chatwootMessageToTextMessage(chatwootMessage));
         widget.onMessageReceived?.call(chatwootMessage);
+        chatwootClient?.seenAll();
       },
       onMessageDelivered: (chatwootMessage, echoId) {
         _handleMessageSent(_chatwootMessageToTextMessage(chatwootMessage, echoId: echoId));
@@ -248,6 +249,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
             status: types.Status.delivered);
         _handleMessageSent(textMessage);
         widget.onMessageSent?.call(chatwootMessage);
+        chatwootClient?.seenAll();
       },
       onConversationResolved: () {
         final resolvedMessage = types.TextMessage(

@@ -13,6 +13,8 @@ import 'package:chatwoot_sdk/data/remote/responses/chatwoot_event.dart';
 import 'package:chatwoot_sdk/data/remote/service/chatwoot_client_service.dart';
 import 'package:flutter/material.dart';
 
+import 'local/entity/chatwoot_conversation.dart';
+
 /// Handles interactions between chatwoot client api service[clientService] and
 /// [localStorage] if persistence is enabled.
 ///
@@ -68,6 +70,7 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
     try {
       final messages = await clientService.getAllMessages();
       await localStorage.messagesDao.saveAllMessages(messages);
+      print("hello get all messages ${messages.length}");
       callbacks.onMessagesRetrieved?.call(messages);
     } on ChatwootClientException catch (e) {
       callbacks.onError?.call(e);
@@ -199,6 +202,21 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         } else {
           callbacks.onConversationIsOffline?.call();
         }
+      } else if (chatwootEvent.message?.event ==
+          ChatwootEventMessageType.conversation_updated){
+        print("hello conversation updated $event");
+        clientService.getConversations().then((value) {
+          clientService.getConversations().then((conversations) {
+            final persistedConversation = localStorage.conversationDao.getConversation()!;
+            final refreshedConversation = conversations.firstWhere(
+                    (element) => element.id == persistedConversation.id,
+                orElse: () =>
+                persistedConversation //highly unlikely orElse will be called but still added it just in case
+            );
+            localStorage.conversationDao.saveConversation(refreshedConversation);
+          });
+
+        });
       } else {
         print("chatwoot unknown event: $event");
       }

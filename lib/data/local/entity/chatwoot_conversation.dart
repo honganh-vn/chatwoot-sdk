@@ -29,11 +29,24 @@ class ChatwootConversation extends Equatable {
   @HiveField(3)
   final ChatwootContact contact;
 
+ ///Total unread
+  @JsonKey()
+  @HiveField(4)
+  final int? unreadCount;
+
+  ///date and time message was created
+  @JsonKey(name: "contact_last_seen", fromJson: createdAtFromJson)
+  @HiveField(5)
+  final String? contactLastSeen;
+
   ChatwootConversation(
       {required this.id,
       required this.inboxId,
       required this.messages,
-      required this.contact});
+      required this.contact,
+      required this.unreadCount,
+      required this.contactLastSeen,
+      });
 
   factory ChatwootConversation.fromJson(Map<String, dynamic> json) =>
       _$ChatwootConversationFromJson(json);
@@ -41,5 +54,5 @@ class ChatwootConversation extends Equatable {
   Map<String, dynamic> toJson() => _$ChatwootConversationToJson(this);
 
   @override
-  List<Object?> get props => [id, inboxId, messages, contact];
+  List<Object?> get props => [id, inboxId, messages, contact, unreadCount, contactLastSeen];
 }

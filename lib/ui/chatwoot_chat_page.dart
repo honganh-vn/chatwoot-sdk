@@ -16,6 +16,8 @@ import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
+import '../data/local/entity/chatwoot_conversation.dart';
+
 ///Chatwoot chat widget
 /// {@category FlutterClientSdk}
 class ChatwootChat extends StatefulWidget {
@@ -230,7 +232,6 @@ class _ChatwootChatState extends State<ChatwootChat> {
       onMessageReceived: (chatwootMessage) {
         _addMessage(_chatwootMessageToTextMessage(chatwootMessage));
         widget.onMessageReceived?.call(chatwootMessage);
-        chatwootClient?.seenAll();
       },
       onMessageDelivered: (chatwootMessage, echoId) {
         _handleMessageSent(_chatwootMessageToTextMessage(chatwootMessage, echoId: echoId));
@@ -329,6 +330,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
   void _addMessage(types.Message message) {
     setState(() {
       _messages.insert(0, message);
+      print("hello onMessageReceived message ${_messages.length}");
     });
   }
 
@@ -550,6 +552,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
           ),
           onRefresh: () async {
             chatwootClient?.loadMessages();
+            // Initialize a variable to store the total unread count
             setState(() {});
           }),
     );

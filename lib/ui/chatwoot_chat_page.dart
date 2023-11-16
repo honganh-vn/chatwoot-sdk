@@ -167,6 +167,7 @@ class ChatwootChat extends StatefulWidget {
 class _ChatwootChatState extends State<ChatwootChat> {
   ///
   List<types.Message> _messages = [];
+  int _totalUnread = 0;
 
   late String status;
 
@@ -232,6 +233,26 @@ class _ChatwootChatState extends State<ChatwootChat> {
       onMessageReceived: (chatwootMessage) {
         _addMessage(_chatwootMessageToTextMessage(chatwootMessage));
         widget.onMessageReceived?.call(chatwootMessage);
+        var currentConversation = chatwootClient?.getCurrentConversation();
+
+        var totalUnreadMsg = _messages.where((element) {
+          if (element.createdAt == null) {
+            return false;
+          }
+          if (element.author.id == widget.user?.identifier) {
+            return false;
+          }
+
+          if (currentConversation?.contactLastSeen == null) {
+            return true;
+          }
+          return element.createdAt!/1000 > currentConversation!.contactLastSeen!;
+        }).length;
+        setState(() {
+          _totalUnread = totalUnreadMsg;
+        });
+
+        // todo calculate total unread msg
       },
       onMessageDelivered: (chatwootMessage, echoId) {
         _handleMessageSent(_chatwootMessageToTextMessage(chatwootMessage, echoId: echoId));

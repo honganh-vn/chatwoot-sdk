@@ -35,9 +35,9 @@ class ChatwootConversation extends Equatable {
   final int? unreadCount;
 
   ///date and time message was created
-  @JsonKey(name: "contact_last_seen", fromJson: createdAtFromJson)
+  @JsonKey(name: "contact_last_seen_at", )
   @HiveField(5)
-  final String? contactLastSeen;
+  final int? contactLastSeen;
 
   ChatwootConversation(
       {required this.id,

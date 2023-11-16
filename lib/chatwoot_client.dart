@@ -58,6 +58,10 @@ class ChatwootClient {
     return Future.value(10);
   }
 
+  ChatwootConversation getCurrentConversation() {
+    return _repository.getPersistedConversation();
+  }
+
   /// Sends chatwoot message. The echoId is your temporary message id. When message sends successfully
   /// [ChatwootMessage] will be returned with the [echoId] on [ChatwootCallbacks.onMessageSent]. If
   /// message fails to send [ChatwootCallbacks.onError] will be triggered [echoId] as data.

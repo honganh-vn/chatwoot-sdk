@@ -35,6 +35,8 @@ abstract class ChatwootRepository {
 
   void getPersistedMessages();
 
+  ChatwootConversation getPersistedConversation();
+
   Future<void> getMessages();
 
   void listenForEvents();
@@ -268,5 +270,11 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
       callbacks.onConversationIsOffline?.call();
       _presenceResetTimer?.cancel();
     });
+  }
+
+  @override
+  ChatwootConversation getPersistedConversation() {
+    final persistedConversation = localStorage.conversationDao.getConversation()!;
+    return persistedConversation;
   }
 }

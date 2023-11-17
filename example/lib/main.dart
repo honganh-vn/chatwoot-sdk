@@ -44,37 +44,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Chatwoot Example"),
-        actions: [
-          IconButton(
-              onPressed: () {
-                ChatwootChatDialog.show(
-                  context,
-                  baseUrl: "<baseUrl here>",
-                  inboxIdentifier: "<inboxIdentifier here>",
-                  title: "Chatwoot Support",
-                  user: ChatwootUser(
-                      identifier: "john@gmail.com",
-                      name: "John Samuel",
-                      email: "john@gmail.com",
-                      phoneNumber: '+233xxxxxxx',
-                      avatarUrl:
-                          'https://plus.unsplash.com/premium_photo-1690579805307-7ec030c75543?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'),
-                );
-              },
-              icon: Icon(Icons.message))
-        ],
       ),
       body: SafeArea(
         child: ChatwootChat(
-          baseUrl: "<baseUrl here>",
-          inboxIdentifier: "<inboxIdentifier here>",
+          baseUrl: "https://cs.c-group.global",
+          inboxIdentifier: "P91XpAkFQFBucANSa3przJGP",
+          notificationToken: "du5i5sTMakSarZcikEVfMP:APA91bFtjyJ104ybVDkKqw79FjkLuwlSjw5DuaLqF3haU7bmAnx91FVu_1k4dV3Dhj3YnENBCUhAF_CsORONe7s11WInid8W64GTJuy1SxlLbiTzuTaWhNEtW6eLhT03AXgIuvQ1B0DA",
           user: ChatwootUser(
-              identifier: "john@gmail.com",
-              name: "John Samuel",
-              email: "john@gmail.com",
-              phoneNumber: '+233xxxxxxx',
-              avatarUrl:
-                  'https://plus.unsplash.com/premium_photo-1690579805307-7ec030c75543?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'),
+              identifier: "Thanh5",
+              name: "Thanh5",
+            email: "thanh5@gmail.com",
+          ),
           showUserAvatars: true,
           showUserNames: true,
         ),

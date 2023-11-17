@@ -1,4 +1,5 @@
 import 'package:chatwoot_sdk/data/chatwoot_repository.dart';
+import 'package:chatwoot_sdk/data/local/entity/chatwoot_conversation.dart';
 import 'package:chatwoot_sdk/data/local/entity/chatwoot_message.dart';
 import 'package:chatwoot_sdk/data/remote/chatwoot_client_exception.dart';
 import 'package:chatwoot_sdk/data/remote/responses/chatwoot_event.dart';
@@ -64,6 +65,8 @@ class ChatwootCallbacks {
   ///Triggered when an agent resolves the current conversation
   void Function()? onConversationResolved;
 
+  void Function(ChatwootConversation)? onConversationUpdated;
+
   /// Triggered when any error occurs in chatwoot client's operations with the error
   ///
   /// See [ChatwootClientExceptionType] for the various types of exceptions that can be triggered
@@ -84,6 +87,7 @@ class ChatwootCallbacks {
     this.onConversationIsOnline,
     this.onConversationIsOffline,
     this.onConversationResolved,
+    this.onConversationUpdated,
     this.onError,
   });
 }

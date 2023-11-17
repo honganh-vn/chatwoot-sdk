@@ -12,12 +12,14 @@ class ChatwootClientApiInterceptor extends Interceptor {
   static const INTERCEPTOR_CONVERSATION_IDENTIFIER_PLACEHOLDER = "{CONVERSATION_IDENTIFIER}";
 
   final String _inboxIdentifier;
+  final String? notificationToken;
   final LocalStorage _localStorage;
   final ChatwootClientAuthService _authService;
   final requestLock = synchronized.Lock();
   final responseLock = synchronized.Lock();
 
-  ChatwootClientApiInterceptor(this._inboxIdentifier, this._localStorage, this._authService);
+
+  ChatwootClientApiInterceptor(this._inboxIdentifier, this._localStorage, this._authService, this.notificationToken);
 
   /// Creates a new contact and conversation when no persisted contact is found when an api call is made
   @override
@@ -31,14 +33,15 @@ class ChatwootClientApiInterceptor extends Interceptor {
         // create new contact from user if no token found
         contact = await _authService.createNewContact(_inboxIdentifier, _localStorage.userDao.getUser());
         if (contact == null) return;
-        conversation = await _authService.createNewConversation(_inboxIdentifier, contact.contactIdentifier!);
+        conversation = await _authService.createNewConversation(_inboxIdentifier, contact.contactIdentifier!, {"notification_token": this.notificationToken});
         await _localStorage.conversationDao.saveConversation(conversation);
         await _localStorage.contactDao.saveContact(contact);
       }
 
       if (conversation == null) {
         conversation =
-            await _authService.createNewConversation(_inboxIdentifier, contact.contactIdentifier!);
+            await _authService.createNewConversation(_inboxIdentifier, contact.contactIdentifier!,
+                {"notification_token": notificationToken});
         await _localStorage.conversationDao.saveConversation(conversation);
       }
 
@@ -64,7 +67,7 @@ class ChatwootClientApiInterceptor extends Interceptor {
         // create new contact from user if unauthorized,forbidden or not found
         final contact = _localStorage.contactDao.getContact()!;
         final conversation =
-            await _authService.createNewConversation(_inboxIdentifier, contact.contactIdentifier!);
+            await _authService.createNewConversation(_inboxIdentifier, contact.contactIdentifier!, {"notification_token": this.notificationToken});
         await _localStorage.contactDao.saveContact(contact);
         await _localStorage.conversationDao.saveConversation(conversation);
 

@@ -206,7 +206,6 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         }
       } else if (chatwootEvent.message?.event ==
           ChatwootEventMessageType.conversation_updated){
-        print("hello conversation updated $event");
         clientService.getConversations().then((value) {
           clientService.getConversations().then((conversations) {
             final persistedConversation = localStorage.conversationDao.getConversation()!;
@@ -216,6 +215,7 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
                 persistedConversation //highly unlikely orElse will be called but still added it just in case
             );
             localStorage.conversationDao.saveConversation(refreshedConversation);
+            callbacks.onConversationUpdated?.call(refreshedConversation);
           });
 
         });

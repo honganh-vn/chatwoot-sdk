@@ -30,7 +30,7 @@ final chatwootClientApiInterceptorProvider =
   final localStorage = ref.read(localStorageProvider(params));
   final authService = ref.read(chatwootClientAuthServiceProvider(params));
   return ChatwootClientApiInterceptor(
-      params.inboxIdentifier, localStorage, authService);
+      params.inboxIdentifier, localStorage, authService, params.notificationToken);
 });
 
 ///Provides an instance of Dio with interceptors set to authenticate all requests called with this dio instance

@@ -20,7 +20,7 @@ abstract class ChatwootClientAuthService {
   Future<ChatwootContact> updateContact(String inboxIdentifier, ChatwootUser? user);
 
   Future<ChatwootConversation> createNewConversation(
-      String inboxIdentifier, String contactIdentifier);
+      String inboxIdentifier, String contactIdentifier, Map<String, String?> customFields);
 }
 
 /// Default Implementation for [ChatwootClientAuthService]
@@ -48,11 +48,15 @@ class ChatwootClientAuthServiceImpl extends ChatwootClientAuthService {
 
   ///Creates a new conversation for inbox with [inboxIdentifier] and contact with source id [contactIdentifier]
   @override
-  Future<ChatwootConversation> createNewConversation(
-      String inboxIdentifier, String contactIdentifier) async {
+  Future<ChatwootConversation> createNewConversation(String inboxIdentifier, String contactIdentifier, Map<String, String?> customFields) async {
     try {
+      Object body = {
+        "custom_attributes": customFields
+      };
+
       final createResponse = await dio.post(
-          "/public/api/v1/inboxes/$inboxIdentifier/contacts/$contactIdentifier/conversations");
+          "/public/api/v1/inboxes/$inboxIdentifier/contacts/$contactIdentifier/conversations",
+          data: body);
       if ((createResponse.statusCode ?? 0).isBetween(199, 300)) {
         //creating contact successful continue with request
         final newConversation = ChatwootConversation.fromJson(createResponse.data);

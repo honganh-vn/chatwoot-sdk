@@ -22,12 +22,13 @@ class ChatwootClient {
   final ChatwootParameters _parameters;
   final ChatwootCallbacks? callbacks;
   final ChatwootUser? user;
+  final String? notificationToken;
 
   String get baseUrl => _parameters.baseUrl;
 
   String get inboxIdentifier => _parameters.inboxIdentifier;
 
-  ChatwootClient._(this._parameters, {this.user, this.callbacks}) {
+  ChatwootClient._(this._parameters, {this.user, this.callbacks, this.notificationToken}) {
     providerContainerMap.putIfAbsent(_parameters.clientInstanceKey, () => ProviderContainer());
     final container = providerContainerMap[_parameters.clientInstanceKey]!;
     _repository = container.read(chatwootRepositoryProvider(
@@ -100,7 +101,8 @@ class ChatwootClient {
       required String inboxIdentifier,
       ChatwootUser? user,
       bool enablePersistence = true,
-      ChatwootCallbacks? callbacks}) async {
+      ChatwootCallbacks? callbacks,
+        required String? notificationToken}) async {
     if (enablePersistence) {
       await LocalStorage.openDB();
     }
@@ -111,9 +113,11 @@ class ChatwootClient {
         isPersistenceEnabled: enablePersistence,
         baseUrl: baseUrl,
         inboxIdentifier: inboxIdentifier,
+        notificationToken: notificationToken,
         userIdentifier: user?.identifier);
 
-    final client = ChatwootClient._(chatwootParams, callbacks: callbacks, user: user);
+    final client = ChatwootClient._(chatwootParams, callbacks: callbacks, user: user,
+        notificationToken: notificationToken);
 
     client._init();
 

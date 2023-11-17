@@ -42,6 +42,8 @@ class ChatwootChat extends StatefulWidget {
   /// Custom user details to be attached to chatwoot contact
   final ChatwootUser? user;
 
+  final String? notificationToken;
+
   /// See [ChatList.onEndReached]
   final Future<void> Function()? onEndReached;
 
@@ -95,6 +97,8 @@ class ChatwootChat extends StatefulWidget {
   ///See [ChatwootCallbacks.onConversationIsOffline]
   final void Function()? onConversationIsOffline;
 
+  final void Function(ChatwootConversation)? onConversationUpdated;
+
   ///See [ChatwootCallbacks.onConversationStoppedTyping]
   final void Function()? onConversationStoppedTyping;
 
@@ -121,6 +125,7 @@ class ChatwootChat extends StatefulWidget {
 
   ///Horizontal padding is reduced if set to true
   final bool isPresentedInDialog;
+
 
   // final void Function()? onAttachmentPressed;
 
@@ -156,8 +161,9 @@ class ChatwootChat extends StatefulWidget {
       this.onConversationStoppedTyping,
       this.onConversationIsOnline,
       this.onConversationIsOffline,
+      this.onConversationUpdated,
       this.onError,
-      this.isPresentedInDialog = false})
+      this.isPresentedInDialog = false, this.notificationToken})
       : super(key: key);
 
   @override
@@ -235,24 +241,17 @@ class _ChatwootChatState extends State<ChatwootChat> {
         widget.onMessageReceived?.call(chatwootMessage);
         var currentConversation = chatwootClient?.getCurrentConversation();
 
-        var totalUnreadMsg = _messages.where((element) {
-          if (element.createdAt == null) {
-            return false;
-          }
-          if (element.author.id == widget.user?.identifier) {
-            return false;
-          }
-
-          if (currentConversation?.contactLastSeen == null) {
-            return true;
-          }
-          return element.createdAt!/1000 > currentConversation!.contactLastSeen!;
-        }).length;
+        int totalUnreadMsg = getTotalUnread(currentConversation);
         setState(() {
           _totalUnread = totalUnreadMsg;
         });
 
-        // todo calculate total unread msg
+      },
+      onConversationUpdated: (conversation) {
+        int totalUnreadMsg = getTotalUnread(conversation);
+        setState(() {
+          _totalUnread = totalUnreadMsg;
+        });
       },
       onMessageDelivered: (chatwootMessage, echoId) {
         _handleMessageSent(_chatwootMessageToTextMessage(chatwootMessage, echoId: echoId));
@@ -299,6 +298,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
             inboxIdentifier: widget.inboxIdentifier,
             user: widget.user,
             enablePersistence: widget.enablePersistence,
+            notificationToken: widget.notificationToken,
             callbacks: chatwootCallbacks)
         .then((client) {
       setState(() {
@@ -310,6 +310,23 @@ class _ChatwootChatState extends State<ChatwootChat> {
           error.toString(), ChatwootClientExceptionType.CREATE_CLIENT_FAILED));
       print("chatwoot client failed with error $error: $stackTrace");
     });
+  }
+
+  int getTotalUnread(ChatwootConversation? currentConversation) {
+    var totalUnreadMsg = _messages.where((element) {
+      if (element.createdAt == null) {
+        return false;
+      }
+      if (element.author.id == widget.user?.identifier) {
+        return false;
+      }
+
+      if (currentConversation?.contactLastSeen == null) {
+        return true;
+      }
+      return element.createdAt!/1000 > currentConversation!.contactLastSeen!;
+    }).length;
+    return totalUnreadMsg;
   }
 
   types.TextMessage _chatwootMessageToTextMessage(ChatwootMessage message, {String? echoId}) {
@@ -562,7 +579,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Text(
-                        "Powered by Chatwoot",
+                        "Number unread ${_totalUnread}",
                         style: TextStyle(color: Colors.black45, fontSize: 12),
                       ),
                     )

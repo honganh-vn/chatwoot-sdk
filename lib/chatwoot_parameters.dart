@@ -6,13 +6,15 @@ class ChatwootParameters extends Equatable {
   final String clientInstanceKey;
   final String inboxIdentifier;
   final String? userIdentifier;
+  final String? notificationToken;
 
   ChatwootParameters(
       {required this.isPersistenceEnabled,
       required this.baseUrl,
       required this.inboxIdentifier,
       required this.clientInstanceKey,
-      this.userIdentifier});
+      this.userIdentifier,
+        this.notificationToken});
 
   @override
   List<Object?> get props => [
@@ -20,6 +22,7 @@ class ChatwootParameters extends Equatable {
         baseUrl,
         clientInstanceKey,
         inboxIdentifier,
-        userIdentifier
+        userIdentifier,
+        notificationToken,
       ];
 }

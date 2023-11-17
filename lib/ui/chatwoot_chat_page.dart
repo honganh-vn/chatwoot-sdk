@@ -132,7 +132,7 @@ class ChatwootChat extends StatefulWidget {
 
   // final void Function()? onAttachmentPressed;
 
-  const ChatwootChat(
+  ChatwootChat(
       {Key? key,
       required this.baseUrl,
       required this.inboxIdentifier,

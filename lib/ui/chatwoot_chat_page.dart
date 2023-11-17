@@ -126,6 +126,9 @@ class ChatwootChat extends StatefulWidget {
   ///Horizontal padding is reduced if set to true
   final bool isPresentedInDialog;
 
+  ///Chatwoot client
+  ChatwootClient? chatwootClient;
+
 
   // final void Function()? onAttachmentPressed;
 
@@ -163,6 +166,7 @@ class ChatwootChat extends StatefulWidget {
       this.onConversationIsOffline,
       this.onConversationUpdated,
       this.onError,
+      this.chatwootClient,
       this.isPresentedInDialog = false, this.notificationToken})
       : super(key: key);
 
@@ -293,23 +297,28 @@ class _ChatwootChatState extends State<ChatwootChat> {
       },
     );
 
-    ChatwootClient.create(
-            baseUrl: widget.baseUrl,
-            inboxIdentifier: widget.inboxIdentifier,
-            user: widget.user,
-            enablePersistence: widget.enablePersistence,
-            notificationToken: widget.notificationToken,
-            callbacks: chatwootCallbacks)
-        .then((client) {
-      setState(() {
-        chatwootClient = client;
-        chatwootClient!.loadMessages();
+    if (widget.chatwootClient == null) {
+      ChatwootClient.create(
+          baseUrl: widget.baseUrl,
+          inboxIdentifier: widget.inboxIdentifier,
+          user: widget.user,
+          enablePersistence: widget.enablePersistence,
+          notificationToken: widget.notificationToken,
+          callbacks: chatwootCallbacks)
+          .then((client) {
+        setState(() {
+          chatwootClient = client;
+          chatwootClient!.loadMessages();
+        });
+      }).onError((error, stackTrace) {
+        widget.onError?.call(ChatwootClientException(
+            error.toString(), ChatwootClientExceptionType.CREATE_CLIENT_FAILED));
+        print("chatwoot client failed with error $error: $stackTrace");
       });
-    }).onError((error, stackTrace) {
-      widget.onError?.call(ChatwootClientException(
-          error.toString(), ChatwootClientExceptionType.CREATE_CLIENT_FAILED));
-      print("chatwoot client failed with error $error: $stackTrace");
-    });
+    } else {
+      chatwootClient = widget.chatwootClient;
+    }
+
   }
 
   int getTotalUnread(ChatwootConversation? currentConversation) {

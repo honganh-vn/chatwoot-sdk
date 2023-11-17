@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
           user: ChatwootUser(
               identifier: "Thanh5",
               name: "Thanh5",
-            email: "thanh5@gmail.com",
+              email: "thanh5@gmail.com",
           ),
           showUserAvatars: true,
           showUserNames: true,

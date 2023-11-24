@@ -46,7 +46,7 @@ class ChatwootClient {
   ///Retrieves chatwoot client's messages. If persistence is enabled [ChatwootCallbacks.onPersistedMessagesRetrieved]
   ///will be triggered with persisted messages. On successfully fetch from remote server
   ///[ChatwootCallbacks.onMessagesRetrieved] will be triggered
-  void loadMessages() async {
+  Future<void> loadMessages() async {
     await _repository.getMessages();
     _repository.getPersistedMessages();
   }

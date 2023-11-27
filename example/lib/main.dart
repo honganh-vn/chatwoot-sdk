@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: SafeArea(
         child: ChatwootChat(
           baseUrl: "https://cs.c-group.global",
-          inboxIdentifier: "P91XpAkFQFBucANSa3przJGP",
+          inboxIdentifier: "rHR2oPXYvaxjZhFfLsCSP7mf",
           notificationToken: "du5i5sTMakSarZcikEVfMP:APA91bFtjyJ104ybVDkKqw79FjkLuwlSjw5DuaLqF3haU7bmAnx91FVu_1k4dV3Dhj3YnENBCUhAF_CsORONe7s11WInid8W64GTJuy1SxlLbiTzuTaWhNEtW6eLhT03AXgIuvQ1B0DA",
           user: ChatwootUser(
               identifier: "Thanh5",

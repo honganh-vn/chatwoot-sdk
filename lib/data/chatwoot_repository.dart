@@ -10,9 +10,11 @@ import 'package:chatwoot_sdk/data/remote/chatwoot_client_exception.dart';
 import 'package:chatwoot_sdk/data/remote/requests/chatwoot_action_data.dart';
 import 'package:chatwoot_sdk/data/remote/requests/chatwoot_new_message_request.dart';
 import 'package:chatwoot_sdk/data/remote/responses/chatwoot_event.dart';
+import 'package:chatwoot_sdk/data/remote/service/chatwoot_client_auth_service.dart';
 import 'package:chatwoot_sdk/data/remote/service/chatwoot_client_service.dart';
 import 'package:flutter/material.dart';
 
+import 'local/entity/chatwoot_contact.dart';
 import 'local/entity/chatwoot_conversation.dart';
 
 /// Handles interactions between chatwoot client api service[clientService] and
@@ -24,12 +26,20 @@ abstract class ChatwootRepository {
   @protected
   final ChatwootClientService clientService;
   @protected
+  final ChatwootClientAuthService clientAuthService;
+
+  @protected
   final LocalStorage localStorage;
   @protected
   ChatwootCallbacks callbacks;
+
+  @protected
+  String inboxIdentifier;
+
   List<StreamSubscription> _subscriptions = [];
 
-  ChatwootRepository(this.clientService, this.localStorage, this.callbacks);
+  ChatwootRepository(this.clientService, this.clientAuthService,
+      this.localStorage, this.callbacks, this.inboxIdentifier);
 
   Future<void> initialize(ChatwootUser? user);
 
@@ -57,9 +67,11 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
 
   ChatwootRepositoryImpl(
       {required ChatwootClientService clientService,
+        required ChatwootClientAuthService clientAuthService,
       required LocalStorage localStorage,
-      required ChatwootCallbacks streamCallbacks})
-      : super(clientService, localStorage, streamCallbacks);
+      required ChatwootCallbacks streamCallbacks, required String inboxIdentifier})
+      : super(clientService, clientAuthService, localStorage,
+      streamCallbacks, inboxIdentifier);
 
   /// Fetches persisted messages.
   ///
@@ -119,6 +131,23 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
   ///Sends message to chatwoot inbox
   Future<void> sendMessage(ChatwootNewMessageRequest request) async {
     try {
+      ChatwootContact? contact = localStorage.contactDao.getContact();
+      ChatwootConversation? conversation = localStorage.conversationDao.getConversation();
+
+      if (contact == null) {
+        // create new contact from user if no token found
+        contact = await clientAuthService.createNewContact(inboxIdentifier, localStorage.userDao.getUser());
+        if (contact == null) return;
+        conversation = await clientAuthService.createNewConversation(inboxIdentifier, contact.contactIdentifier!);
+        await localStorage.conversationDao.saveConversation(conversation);
+        await localStorage.contactDao.saveContact(contact);
+      }
+
+      if (conversation == null || conversation.status == "resolved") {
+        conversation =
+        await clientAuthService.createNewConversation(inboxIdentifier, contact.contactIdentifier!);
+        await localStorage.conversationDao.saveConversation(conversation);
+      }
       final createdMessage = await clientService.createMessage(request);
       await localStorage.messagesDao.saveMessage(createdMessage);
       callbacks.onMessageSent?.call(createdMessage, request.echoId);
@@ -182,13 +211,15 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         callbacks.onConversationStartedTyping?.call();
       } else if (chatwootEvent.message?.event ==
               ChatwootEventMessageType.conversation_status_changed &&
-          chatwootEvent.message?.data?.status == "resolved" &&
           chatwootEvent.message?.data?.id ==
               (localStorage.conversationDao.getConversation()?.id ?? 0)) {
-        //delete conversation result
-        localStorage.conversationDao.deleteConversation();
-        localStorage.messagesDao.clear();
-        callbacks.onConversationResolved?.call();
+        // delete conversation result
+        var persistedConversation = localStorage.conversationDao.getConversation()!;
+        persistedConversation.status = chatwootEvent.message?.data?.status;
+        localStorage.conversationDao.saveConversation(persistedConversation);
+        if (chatwootEvent.message?.data?.status == "resolved"){
+          localStorage.messagesDao.clear();
+          callbacks.onConversationResolved?.call();        }
       } else if (chatwootEvent.message?.event ==
           ChatwootEventMessageType.presence_update) {
         final presenceStatuses =
@@ -205,7 +236,7 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
       } else if (chatwootEvent.message?.event ==
           ChatwootEventMessageType.conversation_updated){
         print("hello conversation updated $event");
-        clientService.getConversations().then((value) {
+        // clientService.getConversations().then((value) {
           clientService.getConversations().then((conversations) {
             final persistedConversation = localStorage.conversationDao.getConversation()!;
             final refreshedConversation = conversations.firstWhere(
@@ -215,8 +246,6 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
             );
             localStorage.conversationDao.saveConversation(refreshedConversation);
           });
-
-        });
       } else {
         print("chatwoot unknown event: $event");
       }
@@ -232,7 +261,10 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
     /// Clears all data related to current chatwoot client instance
   @override
   Future<void> seenAll() async {
-    await clientService.seenAll();
+    var persistedConversation = localStorage.conversationDao.getConversation();
+    if (persistedConversation != null && persistedConversation.status != "resolved"){
+      await clientService.seenAll();
+    }
   }
 
   /// Cancels websocket stream subscriptions and disposes [localStorage]

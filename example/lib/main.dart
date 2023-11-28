@@ -44,37 +44,16 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Chatwoot Example"),
-        actions: [
-          IconButton(
-              onPressed: () {
-                ChatwootChatDialog.show(
-                  context,
-                  baseUrl: "<baseUrl here>",
-                  inboxIdentifier: "<inboxIdentifier here>",
-                  title: "Chatwoot Support",
-                  user: ChatwootUser(
-                      identifier: "john@gmail.com",
-                      name: "John Samuel",
-                      email: "john@gmail.com",
-                      phoneNumber: '+233xxxxxxx',
-                      avatarUrl:
-                          'https://plus.unsplash.com/premium_photo-1690579805307-7ec030c75543?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'),
-                );
-              },
-              icon: Icon(Icons.message))
-        ],
       ),
       body: SafeArea(
         child: ChatwootChat(
-          baseUrl: "<baseUrl here>",
-          inboxIdentifier: "<inboxIdentifier here>",
+          baseUrl: "https://cs.c-group.global",
+          inboxIdentifier: "rHR2oPXYvaxjZhFfLsCSP7mf",
           user: ChatwootUser(
-              identifier: "john@gmail.com",
-              name: "John Samuel",
-              email: "john@gmail.com",
-              phoneNumber: '+233xxxxxxx',
-              avatarUrl:
-                  'https://plus.unsplash.com/premium_photo-1690579805307-7ec030c75543?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80'),
+            identifier: "Thanh5",
+            name: "Thanh5",
+            email: "thanh5@gmail.com",
+          ),
           showUserAvatars: true,
           showUserNames: true,
         ),
@@ -96,8 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final jpg = image.encodeJpg(scaledImage, quality: 90);
 
     final filePath = (await getTemporaryDirectory()).uri.resolve(
-          './image_${DateTime.now().microsecondsSinceEpoch}.jpg',
-        );
+      './image_${DateTime.now().microsecondsSinceEpoch}.jpg',
+    );
     final file = await File.fromUri(filePath).create(recursive: true);
     await file.writeAsBytes(jpg, flush: true);
 

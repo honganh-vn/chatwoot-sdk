@@ -193,6 +193,7 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
       } else if (chatwootEvent.message?.event ==
           ChatwootEventMessageType.message_created) {
         final message = chatwootEvent.message!.data!.getMessage();
+        print("hello6 raw message ${jsonDecode(event)}");
         localStorage.messagesDao.saveMessage(message);
         if (message.isMine) {
           callbacks.onMessageDelivered

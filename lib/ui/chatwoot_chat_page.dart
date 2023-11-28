@@ -241,6 +241,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
         widget.onMessagesRetrieved?.call(messages);
       },
       onMessageReceived: (chatwootMessage) {
+        print("hello6 new message ${chatwootMessage}");
         _addMessage(_chatwootMessageToTextMessage(chatwootMessage));
         widget.onMessageReceived?.call(chatwootMessage);
         var currentConversation = chatwootClient?.getCurrentConversation();
@@ -340,7 +341,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
     return totalUnreadMsg;
   }
 
-  types.TextMessage _chatwootMessageToTextMessage(ChatwootMessage message, {String? echoId}) {
+  types.Message _chatwootMessageToTextMessage(ChatwootMessage message, {String? echoId}) {
     String? avatarUrl = message.sender?.avatarUrl ?? message.sender?.thumbnail;
 
     if (message.sender == null) {
@@ -362,18 +363,56 @@ class _ChatwootChatState extends State<ChatwootChat> {
     if (avatarUrl?.contains("?d=404") ?? false) {
       avatarUrl = null;
     }
-    return types.TextMessage(
+    var firstAttachment = message.attachments?.first;
+    if (firstAttachment == null){
+      var textMessage = types.TextMessage(
+          id: echoId ?? message.id.toString(),
+          author: message.isMine
+              ? _user
+              : types.User(
+            id: message.sender?.id.toString() ?? idGen.v4(),
+            firstName: message.sender?.name,
+            imageUrl: avatarUrl,
+          ),
+          text: message.content ?? "",
+          status: types.Status.seen,
+          createdAt: DateTime.parse(message.createdAt).millisecondsSinceEpoch);
+
+      return textMessage;
+    }
+    // if image
+    if (firstAttachment.fileType == "image"){
+      return types.ImageMessage(
+          id: echoId ?? message.id.toString(),
+          author: message.isMine
+              ? _user
+              : types.User(
+            id: message.sender?.id.toString() ?? idGen.v4(),
+            firstName: message.sender?.name,
+            imageUrl: avatarUrl,
+          ),
+          name: firstAttachment.dataUrl!.split("/").lastOrNull ?? "image.${firstAttachment.fileType}",
+          uri: firstAttachment.dataUrl ?? "",
+          size: 100,
+          status: types.Status.seen,
+          createdAt: DateTime.parse(message.createdAt).millisecondsSinceEpoch);
+
+    }
+    return types.FileMessage(
         id: echoId ?? message.id.toString(),
         author: message.isMine
             ? _user
             : types.User(
-                id: message.sender?.id.toString() ?? idGen.v4(),
-                firstName: message.sender?.name,
-                imageUrl: avatarUrl,
-              ),
-        text: message.content ?? "",
+          id: message.sender?.id.toString() ?? idGen.v4(),
+          firstName: message.sender?.name,
+          imageUrl: avatarUrl,
+        ),
+        name: firstAttachment.dataUrl!.split("/").lastOrNull ?? "file.${firstAttachment.fileType}",
+        uri: firstAttachment.dataUrl ?? "",
+        size: 100,
         status: types.Status.seen,
         createdAt: DateTime.parse(message.createdAt).millisecondsSinceEpoch);
+
   }
 
   void _addMessage(types.Message message) {
@@ -448,6 +487,8 @@ class _ChatwootChatState extends State<ChatwootChat> {
     types.TextMessage message,
     types.PreviewData previewData,
   ) {
+
+    print("hello6 preview data");
     final index = _messages.indexWhere((element) => element.id == message.id);
     final updatedMessage =
         (_messages[index] as types.TextMessage).copyWith(previewData: previewData);

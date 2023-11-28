@@ -115,6 +115,9 @@ class ChatwootEventMessageData {
   @JsonKey()
   final dynamic users;
 
+  @JsonKey()
+  final List<ChatwootAttachment>? attachments;
+
   ChatwootEventMessageData(
       {this.id,
       this.user,
@@ -135,6 +138,7 @@ class ChatwootEventMessageData {
       this.externalSourceIds,
       this.private,
       this.senderId,
+      this.attachments,
       this.users});
 
   factory ChatwootEventMessageData.fromJson(Map<String, dynamic> json) =>
@@ -145,6 +149,27 @@ class ChatwootEventMessageData {
   getMessage() {
     return ChatwootMessage.fromJson(toJson());
   }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ChatwootAttachment {
+  @JsonKey()
+  final int? id;
+
+  @JsonKey(name: "file_type")
+  final String? fileType;
+
+  @JsonKey(name: "data_url")
+  final String? dataUrl;
+
+  ChatwootAttachment({this.id, this.fileType, this.dataUrl});
+
+  factory ChatwootAttachment.fromJson(Map<String, dynamic> json) =>
+      _$ChatwootAttachmentFromJson(json);
+
+
+  Map<String, dynamic> toJson() => _$ChatwootAttachmentToJson(this);
+
 }
 
 /// {@category FlutterClientSdk}

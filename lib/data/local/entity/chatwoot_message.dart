@@ -50,7 +50,7 @@ class ChatwootMessage extends Equatable {
   ///list of media/doc/file attachment for message
   @JsonKey()
   @HiveField(7)
-  final List<dynamic>? attachments;
+  final List<ChatwootAttachment>? attachments;
 
   ///The user this message belongs to
   @JsonKey(name: "sender")

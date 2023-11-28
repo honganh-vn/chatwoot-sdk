@@ -113,6 +113,9 @@ ChatwootEventMessageData _$ChatwootEventMessageDataFromJson(
       externalSourceIds: json['external_source_ids'],
       private: json['private'] as bool?,
       senderId: json['sender_id'] as int?,
+      attachments: (json['attachments'] as List<dynamic>?)
+          ?.map((e) => ChatwootAttachment.fromJson(e as Map<String, dynamic>))
+          .toList(),
       users: json['users'],
     );
 
@@ -139,6 +142,21 @@ Map<String, dynamic> _$ChatwootEventMessageDataToJson(
       'conversation': instance.conversation,
       'user': instance.user?.toJson(),
       'users': instance.users,
+      'attachments': instance.attachments?.map((e) => e.toJson()).toList(),
+    };
+
+ChatwootAttachment _$ChatwootAttachmentFromJson(Map<String, dynamic> json) =>
+    ChatwootAttachment(
+      id: json['id'] as int?,
+      fileType: json['file_type'] as String?,
+      dataUrl: json['data_url'] as String?,
+    );
+
+Map<String, dynamic> _$ChatwootAttachmentToJson(ChatwootAttachment instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'file_type': instance.fileType,
+      'data_url': instance.dataUrl,
     };
 
 ChatwootEventMessageUser _$ChatwootEventMessageUserFromJson(

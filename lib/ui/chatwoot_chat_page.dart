@@ -257,6 +257,8 @@ class _ChatwootChatState extends State<ChatwootChat> {
           _totalUnread = totalUnreadMsg;
         });
       },
+      onConversationCreated: (conversation) {
+      },
       onMessageDelivered: (chatwootMessage, echoId) {
         _handleMessageSent(_chatwootMessageToTextMessage(chatwootMessage, echoId: echoId));
         widget.onMessageDelivered?.call(chatwootMessage);

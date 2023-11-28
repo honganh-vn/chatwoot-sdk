@@ -38,8 +38,6 @@ class ChatwootClientApiInterceptor extends Interceptor {
         await _localStorage.contactDao.saveContact(contact);
       }
 
-      print("hello6 ${conversation}");
-
       if (conversation == null) {
         conversation =
             await _authService.createNewConversation(_inboxIdentifier, contact.contactIdentifier!,

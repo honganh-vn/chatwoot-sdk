@@ -67,6 +67,8 @@ class ChatwootCallbacks {
 
   void Function(ChatwootConversation)? onConversationUpdated;
 
+  void Function(ChatwootConversation)? onConversationCreated;
+
   /// Triggered when any error occurs in chatwoot client's operations with the error
   ///
   /// See [ChatwootClientExceptionType] for the various types of exceptions that can be triggered
@@ -88,6 +90,7 @@ class ChatwootCallbacks {
     this.onConversationIsOffline,
     this.onConversationResolved,
     this.onConversationUpdated,
+    this.onConversationCreated,
     this.onError,
   });
 }

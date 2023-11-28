@@ -82,12 +82,12 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
   @override
   Future<void> getMessages() async {
     try {
-      // var persistedConversation = localStorage.conversationDao.getConversation();
-      // if (persistedConversation != null && persistedConversation.status != "resolved"){
-      //   final messages = await clientService.getAllMessages();
-      //   await localStorage.messagesDao.saveAllMessages(messages);
-      //   callbacks.onMessagesRetrieved?.call(messages);
-      // }
+      var persistedConversation = localStorage.conversationDao.getConversation();
+      if (persistedConversation != null){
+        final messages = await clientService.getAllMessages();
+        await localStorage.messagesDao.saveAllMessages(messages);
+        callbacks.onMessagesRetrieved?.call(messages);
+      }
 
     } on ChatwootClientException catch (e) {
       callbacks.onError?.call(e);

@@ -140,14 +140,14 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         // create new contact from user if no token found
         contact = await clientAuthService.createNewContact(inboxIdentifier, localStorage.userDao.getUser());
         if (contact == null) return;
-        conversation = await clientAuthService.createNewConversation(inboxIdentifier, contact.contactIdentifier!);
+        conversation = await clientAuthService.createNewConversation(inboxIdentifier, contact.contactIdentifier!, {});
         await localStorage.conversationDao.saveConversation(conversation);
         await localStorage.contactDao.saveContact(contact);
       }
 
       if (conversation == null || conversation.status == "resolved") {
         conversation =
-        await clientAuthService.createNewConversation(inboxIdentifier, contact.contactIdentifier!);
+        await clientAuthService.createNewConversation(inboxIdentifier, contact.contactIdentifier!, {});
         await localStorage.conversationDao.saveConversation(conversation);
       }
       final createdMessage = await clientService.createMessage(request);

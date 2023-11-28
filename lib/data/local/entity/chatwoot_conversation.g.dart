@@ -22,7 +22,7 @@ class ChatwootConversationAdapter extends TypeAdapter<ChatwootConversation> {
       messages: (fields[2] as List).cast<ChatwootMessage>(),
       contact: fields[3] as ChatwootContact,
       unreadCount: fields[4] as int?,
-      contactLastSeen: fields[5] as String?,
+      contactLastSeen: fields[5] as int?,
       status: fields[6] as String?,
     );
   }
@@ -73,7 +73,7 @@ ChatwootConversation _$ChatwootConversationFromJson(
       contact:
           ChatwootContact.fromJson(json['contact'] as Map<String, dynamic>),
       unreadCount: json['unreadCount'] as int?,
-      contactLastSeen: createdAtFromJson(json['contact_last_seen']),
+      contactLastSeen: json['contact_last_seen_at'] as int?,
       status: json['status'] as String?,
     );
 
@@ -85,6 +85,6 @@ Map<String, dynamic> _$ChatwootConversationToJson(
       'messages': instance.messages.map((e) => e.toJson()).toList(),
       'contact': instance.contact.toJson(),
       'unreadCount': instance.unreadCount,
-      'contact_last_seen': instance.contactLastSeen,
+      'contact_last_seen_at': instance.contactLastSeen,
       'status': instance.status,
     };

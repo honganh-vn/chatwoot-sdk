@@ -194,8 +194,13 @@ final chatwootRepositoryProvider =
   final clientService =
       ref.read(chatwootClientServiceProvider(repoParams.params));
 
+  final clientAuthService =
+      ref.read(chatwootClientAuthServiceProvider(repoParams.params));
+
   return ChatwootRepositoryImpl(
       clientService: clientService,
+      clientAuthService: clientAuthService,
       localStorage: localStorage,
-      streamCallbacks: repoParams.callbacks);
+      streamCallbacks: repoParams.callbacks,
+      inboxIdentifier: repoParams.params.inboxIdentifier);
 });

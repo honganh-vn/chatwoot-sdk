@@ -22,14 +22,15 @@ class ChatwootConversationAdapter extends TypeAdapter<ChatwootConversation> {
       messages: (fields[2] as List).cast<ChatwootMessage>(),
       contact: fields[3] as ChatwootContact,
       unreadCount: fields[4] as int?,
-      contactLastSeen: fields[5] as int?,
+      contactLastSeen: fields[5] as String?,
+      status: fields[6] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ChatwootConversation obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -41,7 +42,9 @@ class ChatwootConversationAdapter extends TypeAdapter<ChatwootConversation> {
       ..writeByte(4)
       ..write(obj.unreadCount)
       ..writeByte(5)
-      ..write(obj.contactLastSeen);
+      ..write(obj.contactLastSeen)
+      ..writeByte(6)
+      ..write(obj.status);
   }
 
   @override
@@ -70,7 +73,8 @@ ChatwootConversation _$ChatwootConversationFromJson(
       contact:
           ChatwootContact.fromJson(json['contact'] as Map<String, dynamic>),
       unreadCount: json['unreadCount'] as int?,
-      contactLastSeen: json['contact_last_seen_at'] as int?,
+      contactLastSeen: createdAtFromJson(json['contact_last_seen']),
+      status: json['status'] as String?,
     );
 
 Map<String, dynamic> _$ChatwootConversationToJson(
@@ -81,5 +85,6 @@ Map<String, dynamic> _$ChatwootConversationToJson(
       'messages': instance.messages.map((e) => e.toJson()).toList(),
       'contact': instance.contact.toJson(),
       'unreadCount': instance.unreadCount,
-      'contact_last_seen_at': instance.contactLastSeen,
+      'contact_last_seen': instance.contactLastSeen,
+      'status': instance.status,
     };

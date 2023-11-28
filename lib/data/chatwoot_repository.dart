@@ -82,10 +82,13 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
   @override
   Future<void> getMessages() async {
     try {
-      final messages = await clientService.getAllMessages();
-      await localStorage.messagesDao.saveAllMessages(messages);
-      print("hello get all messages ${messages.length}");
-      callbacks.onMessagesRetrieved?.call(messages);
+      // var persistedConversation = localStorage.conversationDao.getConversation();
+      // if (persistedConversation != null && persistedConversation.status != "resolved"){
+      //   final messages = await clientService.getAllMessages();
+      //   await localStorage.messagesDao.saveAllMessages(messages);
+      //   callbacks.onMessagesRetrieved?.call(messages);
+      // }
+
     } on ChatwootClientException catch (e) {
       callbacks.onError?.call(e);
     }
@@ -116,13 +119,16 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
       //refresh conversation
       final conversations = await clientService.getConversations();
       final persistedConversation =
-          localStorage.conversationDao.getConversation()!;
-      final refreshedConversation = conversations.firstWhere(
-          (element) => element.id == persistedConversation.id,
-          orElse: () =>
-              persistedConversation //highly unlikely orElse will be called but still added it just in case
-          );
-      localStorage.conversationDao.saveConversation(refreshedConversation);
+          localStorage.conversationDao.getConversation();
+      if (persistedConversation != null){
+        final refreshedConversation = conversations.firstWhere(
+                (element) => element.id == persistedConversation.id,
+            orElse: () =>
+            persistedConversation //highly unlikely orElse will be called but still added it just in case
+        );
+        localStorage.conversationDao.saveConversation(refreshedConversation);
+      }
+
     } on ChatwootClientException catch (e) {
       callbacks.onError?.call(e);
     }

@@ -186,7 +186,6 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         callbacks.onConfirmedSubscription?.call();
       } else if (chatwootEvent.message?.event ==
           ChatwootEventMessageType.message_created) {
-        print("here comes message: $event");
         final message = chatwootEvent.message!.data!.getMessage();
         localStorage.messagesDao.saveMessage(message);
         if (message.isMine) {
@@ -197,7 +196,6 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         }
       } else if (chatwootEvent.message?.event ==
           ChatwootEventMessageType.message_updated) {
-        print("here comes the updated message: $event");
 
         final message = chatwootEvent.message!.data!.getMessage();
         localStorage.messagesDao.saveMessage(message);
@@ -235,7 +233,6 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         }
       } else if (chatwootEvent.message?.event ==
           ChatwootEventMessageType.conversation_updated){
-        print("hello conversation updated $event");
         // clientService.getConversations().then((value) {
           clientService.getConversations().then((conversations) {
             final persistedConversation = localStorage.conversationDao.getConversation()!;

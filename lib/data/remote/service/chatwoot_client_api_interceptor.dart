@@ -32,9 +32,7 @@ class ChatwootClientApiInterceptor extends Interceptor {
       if (contact == null) {
         // create new contact from user if no token found
         contact = await _authService.createNewContact(_inboxIdentifier, _localStorage.userDao.getUser());
-        if (contact == null) return;
-        conversation = await _authService.createNewConversation(_inboxIdentifier, contact.contactIdentifier!, {"notification_token": this.notificationToken});
-        await _localStorage.conversationDao.saveConversation(conversation);
+        if (contact.id == null) return;
         await _localStorage.contactDao.saveContact(contact);
       }
 

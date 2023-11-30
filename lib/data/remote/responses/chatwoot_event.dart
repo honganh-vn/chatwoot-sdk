@@ -151,6 +151,7 @@ class ChatwootEventMessageData {
   }
 }
 
+@HiveType(typeId: CHATWOOT_ATTACHMENT_HIVE_TYPE_ID)
 @JsonSerializable(explicitToJson: true)
 class ChatwootAttachment {
   @JsonKey()

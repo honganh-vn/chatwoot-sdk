@@ -6,6 +6,35 @@ part of 'chatwoot_event.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
+class ChatwootAttachmentAdapter extends TypeAdapter<ChatwootAttachment> {
+  @override
+  final int typeId = 5;
+
+  @override
+  ChatwootAttachment read(BinaryReader reader) {
+    final numOfFields = reader.readByte();
+    final fields = <int, dynamic>{
+      for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
+    };
+    return ChatwootAttachment();
+  }
+
+  @override
+  void write(BinaryWriter writer, ChatwootAttachment obj) {
+    writer.writeByte(0);
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ChatwootAttachmentAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
 class ChatwootEventMessageUserAdapter
     extends TypeAdapter<ChatwootEventMessageUser> {
   @override

@@ -367,6 +367,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
     if (firstAttachment == null){
       var textMessage = types.TextMessage(
           id: echoId ?? message.id.toString(),
+          previewData: types.PreviewData(link: message.content!),
           author: message.isMine
               ? _user
               : types.User(
@@ -563,7 +564,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
                 child: Chat(
                   messages: _messages,
                   onMessageTap: _handleMessageTap,
-                  onPreviewDataFetched: _handlePreviewDataFetched,
+                  // onPreviewDataFetched: _handlePreviewDataFetched,
                   onSendPressed: _handleSendPressed,
                   // onAttachmentPressed: _handleAttachmentPressed,
                   user: _user,

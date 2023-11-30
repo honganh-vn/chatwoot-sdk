@@ -15,6 +15,7 @@ const CHATWOOT_CONVERSATION_HIVE_TYPE_ID = 1;
 const CHATWOOT_MESSAGE_HIVE_TYPE_ID = 2;
 const CHATWOOT_USER_HIVE_TYPE_ID = 3;
 const CHATWOOT_EVENT_USER_HIVE_TYPE_ID = 4;
+const CHATWOOT_ATTACHMENT_HIVE_TYPE_ID = 5;
 
 class LocalStorage {
   ChatwootUserDao userDao;
@@ -46,6 +47,9 @@ class LocalStorage {
       }
       if (!Hive.isAdapterRegistered(CHATWOOT_USER_HIVE_TYPE_ID)) {
         Hive..registerAdapter(ChatwootUserAdapter());
+      }
+      if (!Hive.isAdapterRegistered(CHATWOOT_ATTACHMENT_HIVE_TYPE_ID)) {
+        Hive..registerAdapter(ChatwootAttachmentAdapter());
       }
     } else {
       onInitializeHive();

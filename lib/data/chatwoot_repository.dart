@@ -268,7 +268,19 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
   Future<void> seenAll() async {
     var persistedConversation = localStorage.conversationDao.getConversation();
     if (persistedConversation != null && persistedConversation.status != "resolved"){
-      await clientService.seenAll();
+      await clientService.seenAll().then((value) {
+        clientService.getConversations().then((conversations) {
+          final persistedConversation = localStorage.conversationDao
+              .getConversation()!;
+          final refreshedConversation = conversations.firstWhere(
+                  (element) => element.id == persistedConversation.id,
+              orElse: () =>
+              persistedConversation //highly unlikely orElse will be called but still added it just in case
+          );
+          localStorage.conversationDao.saveConversation(refreshedConversation);
+          callbacks.onConversationUpdated?.call(refreshedConversation);
+        });
+      });
     }
   }
 

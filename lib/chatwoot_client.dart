@@ -56,7 +56,7 @@ class ChatwootClient {
     _repository.getPersistedMessages();
   }
 
-  void seenAll() async {
+  Future<void> seenAll() async {
     await _repository.seenAll();
   }
 

@@ -254,6 +254,9 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
       } else {
         print("chatwoot unknown event: $event");
       }
+    }, onDone: (){
+      // reconnect websocket
+      listenForEvents();
     });
     _subscriptions.add(newSubscription);
   }

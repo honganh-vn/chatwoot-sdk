@@ -48,12 +48,10 @@ class ChatwootClient {
   ///[ChatwootCallbacks.onMessagesRetrieved] will be triggered
   void loadMessages() async {
     await _repository.getMessages();
-    _repository.getPersistedMessages();
   }
 
   Future<void> loadMessagesAsync() async {
     await _repository.getMessages();
-    _repository.getPersistedMessages();
   }
 
   Future<void> seenAll() async {

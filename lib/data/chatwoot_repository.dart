@@ -88,6 +88,10 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         await localStorage.messagesDao.saveAllMessages(messages);
         callbacks.onMessagesRetrieved?.call(messages);
       }
+      // try to reconnect the websocket if need
+      if (clientService.connection != null && !_isListeningForEvents) {
+        listenForEvents();
+      }
 
     } on ChatwootClientException catch (e) {
       callbacks.onError?.call(e);
@@ -255,8 +259,7 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
         print("chatwoot unknown event: $event");
       }
     }, onDone: (){
-      // reconnect websocket
-      listenForEvents();
+      _isListeningForEvents = false;
     });
     _subscriptions.add(newSubscription);
   }

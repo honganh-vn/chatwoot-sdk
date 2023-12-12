@@ -62,7 +62,7 @@ class ChatwootClient {
     return Future.value(10);
   }
 
-  ChatwootConversation getCurrentConversation() {
+  ChatwootConversation? getCurrentConversation() {
     return _repository.getPersistedConversation();
   }
 

@@ -45,7 +45,7 @@ abstract class ChatwootRepository {
 
   void getPersistedMessages();
 
-  ChatwootConversation getPersistedConversation();
+  ChatwootConversation? getPersistedConversation();
 
   Future<void> getMessages();
 
@@ -326,8 +326,8 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
   }
 
   @override
-  ChatwootConversation getPersistedConversation() {
-    final persistedConversation = localStorage.conversationDao.getConversation()!;
+  ChatwootConversation? getPersistedConversation() {
+    final persistedConversation = localStorage.conversationDao.getConversation();
     return persistedConversation;
   }
 }

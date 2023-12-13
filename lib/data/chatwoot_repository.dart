@@ -53,6 +53,8 @@ abstract class ChatwootRepository {
 
   Future<void> sendMessage(ChatwootNewMessageRequest request);
 
+  Future<void> sendFile(String filePath, String echoId, bool? isImage);
+
   void sendAction(ChatwootActionType action);
 
   Future<void> clear();
@@ -167,6 +169,36 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
     } on ChatwootClientException catch (e) {
       callbacks.onError?.call(
           ChatwootClientException(e.cause, e.type, data: request.echoId));
+    }
+  }
+
+  ///Sends message file
+  Future<void> sendFile(String filePath, String echoId, bool? isImage) async {
+    try {
+      ChatwootContact? contact = localStorage.contactDao.getContact();
+      ChatwootConversation? conversation = localStorage.conversationDao.getConversation();
+
+      if (contact == null) {
+        // create new contact from user if no token found
+        contact = await clientAuthService.createNewContact(inboxIdentifier, localStorage.userDao.getUser());
+        await localStorage.contactDao.saveContact(contact);
+      }
+
+      if (conversation == null || conversation.status == "resolved") {
+        conversation =
+        await clientAuthService.createNewConversation(inboxIdentifier, contact.contactIdentifier!, {});
+        await localStorage.conversationDao.saveConversation(conversation);
+        callbacks.onConversationCreated?.call(conversation);
+      }
+      final createdMessage = await clientService.sendFile(filePath, echoId, isImage);
+      await localStorage.messagesDao.saveMessage(createdMessage);
+      callbacks.onMessageSent?.call(createdMessage, echoId);
+      if (clientService.connection != null && !_isListeningForEvents) {
+        listenForEvents();
+      }
+    } on ChatwootClientException catch (e) {
+      callbacks.onError?.call(
+          ChatwootClientException(e.cause, e.type, data: echoId));
     }
   }
 

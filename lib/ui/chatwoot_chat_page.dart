@@ -17,6 +17,10 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/local/entity/chatwoot_conversation.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:mime/mime.dart';
+
 
 ///Chatwoot chat widget
 /// {@category FlutterClientSdk}
@@ -438,6 +442,102 @@ class _ChatwootChatState extends State<ChatwootChat> {
     });
   }
 
+  void _handleAttachmentPressed() {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext context) => SafeArea(
+        child: SizedBox(
+          height: 144,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _handleImageSelection();
+                },
+                child: const Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text('Photo'),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _handleFileSelection();
+                },
+                child: const Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text('File'),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text('Cancel'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _handleFileSelection() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      var messageId = const Uuid().v4();
+      final message = types.FileMessage(
+        author: _user,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        id: messageId,
+        mimeType: lookupMimeType(result.files.single.path!),
+        name: result.files.single.name,
+        size: result.files.single.size,
+        uri: result.files.single.path!,
+      );
+
+      _addMessage(message);
+      chatwootClient!.sendFile(filePath: result.files.single.path!, echoId: messageId,
+          isImage: false);
+    }
+  }
+
+  void _handleImageSelection() async {
+    final result = await ImagePicker().pickImage(
+      imageQuality: 70,
+      maxWidth: 1440,
+      source: ImageSource.gallery,
+    );
+
+    if (result != null) {
+      final bytes = await result.readAsBytes();
+      final image = await decodeImageFromList(bytes);
+
+      var messageId = const Uuid().v4();
+      final message = types.ImageMessage(
+        author: _user,
+        createdAt: DateTime.now().millisecondsSinceEpoch,
+        height: image.height.toDouble(),
+        id: messageId,
+        name: result.name,
+        size: bytes.length,
+        uri: result.path,
+        width: image.width.toDouble(),
+      );
+
+      _addMessage(message);
+      chatwootClient!.sendFile(filePath: result.path, echoId: messageId,
+          isImage: true);
+    }
+  }
+
+
   void _handleMessageTap(BuildContext context, types.Message message) async {
     if (message.status == types.Status.error && message is types.TextMessage) {
       _handleResendMessage(message);
@@ -566,7 +666,7 @@ class _ChatwootChatState extends State<ChatwootChat> {
                   onMessageTap: _handleMessageTap,
                   // onPreviewDataFetched: _handlePreviewDataFetched,
                   onSendPressed: _handleSendPressed,
-                  // onAttachmentPressed: _handleAttachmentPressed,
+                  onAttachmentPressed: _handleAttachmentPressed,
                   user: _user,
                   onEndReached: widget.onEndReached,
                   onEndReachedThreshold: widget.onEndReachedThreshold,

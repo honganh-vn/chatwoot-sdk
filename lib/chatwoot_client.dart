@@ -74,6 +74,10 @@ class ChatwootClient {
     await _repository.sendMessage(request);
   }
 
+  Future<void> sendFile({required String filePath, required String echoId, bool? isImage}) async {
+    await _repository.sendFile(filePath, echoId, isImage);
+  }
+
   ///Send chatwoot action performed by user.
   ///
   /// Example: User started typing

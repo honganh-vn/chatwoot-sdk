@@ -305,7 +305,7 @@ class ChatwootRepositoryImpl extends ChatwootRepository {
   @override
   Future<void> seenAll() async {
     var persistedConversation = localStorage.conversationDao.getConversation();
-    if (persistedConversation != null && persistedConversation.status != "resolved"){
+    if (persistedConversation != null){
       await clientService.seenAll().then((value) {
         clientService.getConversations().then((conversations) {
           final persistedConversation = localStorage.conversationDao
